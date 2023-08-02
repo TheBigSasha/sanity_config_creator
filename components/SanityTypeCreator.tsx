@@ -694,7 +694,7 @@ const saveTs = (fp: SanityFieldProperties) => {
 
 const saveJson = (fp: SanityFieldProperties) => {
   const json = JSON.stringify(fp, null, 2);
-    const blob = new Blob([json], { type: "text/plain" });
+    const blob = new Blob([json], { type: "text/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
 
