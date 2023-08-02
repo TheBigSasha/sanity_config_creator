@@ -297,7 +297,7 @@ const Form = styled.form<{ isRoot?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding: ${({ isRoot }) => (!isRoot ? "0" : "2rem")};
+  padding: ${({ isRoot }) => (!isRoot ? "0" : " 0.5rem 2rem 1rem 2rem")};
   margin-top: ${({ isRoot }) => (!isRoot ? "0" : "25px")};
   width: ${({ isRoot }) => (isRoot ? "clamp(300px, 80vw, 650px);" : "300px")};
 `;
@@ -350,8 +350,8 @@ const FieldForm: React.FC<FormFieldProps> = ({
   // @ts-ignore
   const out = <>
       <Form isRoot={isRoot} onSubmit={handleSubmit(onSubmit)}>
-        <Typography variant="h6">
-          {getValues().name || "new field"} {formState.isDirty ? "*" : ""}
+        <Typography variant="h4">
+          {getValues().name || isRoot ? "Schema Editor" : "New Field"} {formState.isDirty ? "*" : ""}
         </Typography>
         <br/>
         <Controller
