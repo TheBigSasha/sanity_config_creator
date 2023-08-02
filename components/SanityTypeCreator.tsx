@@ -14,7 +14,8 @@ import {
   Typography, SpeedDial, SpeedDialIcon, SpeedDialAction,
 } from "@mui/material";
 import styled from "styled-components";
-import {FaArrowCircleRight, FaGithub, FaJs, FaQuestionCircle, FaSave, FaUndo} from "react-icons/fa";
+import { FaGithub, FaJs, FaQuestionCircle, FaSave, FaUndo} from "react-icons/fa";
+import styles from "../styles/Home.module.css";
 
 type SanityFieldType =
   | "Array"
@@ -602,7 +603,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
     return out;
   }
 
-   return  <Paper> {out} </Paper>
+  return  <main className={styles.main}><Paper> {out} </Paper></main>
 
 };
 
@@ -650,7 +651,7 @@ const DEFAULT_DATA: SanityObjectFieldProperties = {
 export const SanityTypeCreator = () => {
   const [ data, setData ] = useState<SanityFieldProperties>(DEFAULT_DATA)
   return (
-    <div>
+    <>
       <FieldForm
         isRoot
         onSubmit={(dta) => {setData(dta); saveTs(dta);}}
@@ -693,6 +694,6 @@ export const SanityTypeCreator = () => {
 
 
       </SpeedDial>
-    </div>
+    </>
   );
 };

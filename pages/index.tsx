@@ -16,13 +16,13 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Code Genreator for <a href="https://www.sanity.io">Sanity CMS!</a>
-        </h1>
+        <header>
+            <h3 className={styles.title}>
+                Code Genreator for <a href="https://www.sanity.io">Sanity CMS</a>
+            </h3>
+        </header>
 
         <SanityTypeCreator />
-      </main>
 
       <footer className={styles.footer}>
         <a href="https://sasharesume.com/">
