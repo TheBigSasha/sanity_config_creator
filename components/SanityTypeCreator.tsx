@@ -296,7 +296,7 @@ const exportSanitySchema = (
 const Form = styled.form<{ isRoot?: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.15rem;
   padding: ${({ isRoot }) => (!isRoot ? "0" : " 0.5rem 2rem 1rem 2rem")};
   margin-top: ${({ isRoot }) => (!isRoot ? "0" : "25px")};
   width: ${({ isRoot }) => (isRoot ? "clamp(300px, 80vw, 650px);" : "300px")};
