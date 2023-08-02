@@ -70,6 +70,11 @@ interface SanityObjectFieldProperties extends SanityFieldProperties {
   fields: SanityFieldProperties[];
 }
 
+interface SanityDocumentFieldProperties extends SanityFieldProperties {
+    type: "Document";
+    fields: SanityFieldProperties[];
+}
+
 interface SanityImageFieldProperties extends SanityFieldProperties {
   type: "Image";
   options: {
@@ -231,7 +236,7 @@ const exportTSInterface = (
     isRoot = true,
 ): string => {
     let outStr = isRoot ? `export interface ${sanitizeName(schema.name)} {\n` : "";
-        if (schema.type === "Object") {
+        if (schema.type === "Object" || schema.type === "Document") {
             const objectSchema = schema as SanityObjectFieldProperties;
             objectSchema.fields.forEach((field) => {
                 outStr += exportTSInterface(field, false);
@@ -619,7 +624,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
                 </>
         )}
 
-        {type === "Object" && (
+        {type === "Object" || type === "Document" && (
           <>
             <Button variant="outlined" onClick={() => append({})}>
               Add Field
@@ -702,8 +707,8 @@ const saveJson = (fp: SanityFieldProperties) => {
 }
 
 
-const DEFAULT_DATA: SanityObjectFieldProperties = {
-  type: "Object",
+const DEFAULT_DATA: SanityDocumentFieldProperties = {
+  type: "Document",
   name: "",
   title: "",
   description: "",
