@@ -11,10 +11,10 @@ import {
   Grid,
   Paper,
   Card,
-  Typography,
+  Typography, SpeedDial, SpeedDialIcon, SpeedDialAction,
 } from "@mui/material";
 import styled from "styled-components";
-import { FaQuestionCircle } from "react-icons/fa";
+import {FaArrowCircleRight, FaGithub, FaJs, FaQuestionCircle, FaSave, FaUndo} from "react-icons/fa";
 
 type SanityFieldType =
   | "Array"
@@ -296,7 +296,8 @@ const Form = styled.form<{ isRoot?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  margin-top: 25px;
+  padding: ${({ isRoot }) => (!isRoot ? "0" : "2rem")};
+  margin-top: ${({ isRoot }) => (!isRoot ? "0" : "25px")};
   width: ${({ isRoot }) => (isRoot ? "clamp(300px, 80vw, 650px);" : "300px")};
 `;
 
@@ -333,7 +334,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
       type={isRoot ? "submit" : "button"}
       variant="contained"
     >
-      {isRoot ? "submit" : "save"}
+      {isRoot ? "download generated code" : "save"}
     </Button>
   );
 
@@ -346,12 +347,12 @@ const FieldForm: React.FC<FormFieldProps> = ({
   const allObjectNames = [...SanityFieldTypes, newlyCreatedObjectNames].flat();
 
   // @ts-ignore
-  return (
-    <>
-      <Typography variant="h6">
-        {getValues().name || "new field"} {formState.isDirty ? "*" : ""}
-      </Typography>
+  const out = <>
       <Form isRoot={isRoot} onSubmit={handleSubmit(onSubmit)}>
+        <Typography variant="h6">
+          {getValues().name || "new field"} {formState.isDirty ? "*" : ""}
+        </Typography>
+        <br/>
         <Controller
           name="name"
           control={control}
@@ -594,24 +595,20 @@ const FieldForm: React.FC<FormFieldProps> = ({
         </>
       </Form>
       {!isRoot && subButton}
-    </>
-  );
+      </>
+
+
+  if(!isRoot) {
+    return out;
+  }
+
+   return  <Paper> {out} </Paper>
+
 };
 
-const saveFiles = (fp: SanityFieldProperties) => {
+const saveTs = (fp: SanityFieldProperties) => {
   // save a JSON file of the schema (JSON stringify) and sanity code (exportSanitySchema -> .ts)
-  const json = JSON.stringify(fp, null, 2);
   const ts = exportSanitySchema(fp, true);
-
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-
-  a.href = url;
-  a.download = `${fp.name}.json`;
-  a.click();
-
-  URL.revokeObjectURL(url);
 
   const blob2 = new Blob([ts], { type: "text/plain" });
   const url2 = URL.createObjectURL(blob2);
@@ -621,26 +618,81 @@ const saveFiles = (fp: SanityFieldProperties) => {
   a2.download = `${fp.name}.ts`;
   a2.click();
 
-  console.log(ts);
 
   URL.revokeObjectURL(url2);
 };
 
+const saveJson = (fp: SanityFieldProperties) => {
+  const json = JSON.stringify(fp, null, 2);
+    const blob = new Blob([json], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = `${fp.name}.json`;
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+}
+
+
+const DEFAULT_DATA: SanityObjectFieldProperties = {
+  type: "Object",
+  name: "",
+  title: "",
+  description: "",
+  fields: [],
+  readOnly: false,
+  hidden: false,
+};
+
 export const SanityTypeCreator = () => {
+  const [ data, setData ] = useState<SanityFieldProperties>(DEFAULT_DATA)
   return (
     <div>
       <FieldForm
         isRoot
-        onSubmit={(data) => saveFiles(data)}
-        defaultValues={{
-          type: "Object",
-          name: "",
-          title: "",
-          description: "",
-          readOnly: false,
-          hidden: false,
-        }}
+        onSubmit={(dta) => {setData(dta); saveTs(dta);}}
+        defaultValues={data}
       />
+      <SpeedDial
+          ariaLabel="Quick Menu"
+          sx={{ position: 'absolute', bottom: "2rem", right: "2rem" }}
+          icon={<SpeedDialIcon />}
+      >
+            <SpeedDialAction
+                icon={<FaJs/>}
+                tooltipTitle={"Save Generated Code (.ts)"}
+                onClick={() => {
+                  saveTs(data);
+                }}/>
+
+        <SpeedDialAction
+            icon={<FaSave/>}
+            tooltipTitle={"Save Entry (.json)"}
+            onClick={() => {
+                saveJson(data);
+            }}/>
+
+
+          <SpeedDialAction
+                icon={<FaGithub/>}
+                tooltipTitle={"View on Github"}
+                onClick={() => {
+                    typeof window !== 'undefined' && window.open("");
+                }}/>
+
+        <SpeedDialAction
+          icon={<FaUndo/>}
+            tooltipTitle={"Reset"}
+            onClick={() =>
+              setData(DEFAULT_DATA)
+            }/>
+
+
+
+      </SpeedDial>
     </div>
   );
 };
