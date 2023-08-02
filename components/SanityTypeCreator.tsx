@@ -189,6 +189,66 @@ const sanitizeName = (name: string): string => {
   return name.replace(" ", "_").replace("[^a-zA-Z0-9_]", "");
 };
 
+const getTSTypeName = (type: SanityFieldType | string): string => {
+  switch (type) {
+    case "Array":
+        return "Array<any>";
+    case "Block":
+        return "Block";
+    case "Boolean":
+        return "boolean";
+    case "Date":
+        return "Date";
+    case "Datetime":
+        return "Date";
+    case "Document":
+        return "Document";
+    case "File":
+        return "File";
+    case "Geopoint":
+        return "Geopoint";
+    case "Image":
+        return "Image";
+    case "Number":
+        return "number";
+    case "Object":
+        return "Object";
+    case "Reference":
+        return "Reference";
+    case "Slug":
+        return "Slug";
+    case "String":
+        return "string";
+    case "Text":
+        return "RichText";
+    default:
+        return "any";
+  }
+}
+
+const exportTSInterface = (
+    schema: SanityFieldProperties,
+    isRoot = true,
+): string => {
+    let outStr = isRoot ? `export interface ${sanitizeName(schema.name)} {\n` : "";
+        if (schema.type === "Object") {
+            const objectSchema = schema as SanityObjectFieldProperties;
+            objectSchema.fields.forEach((field) => {
+                outStr += exportTSInterface(field, false);
+            });
+        } else if (schema.type === "Array") {
+            const arraySchema = schema as SanityArrayFieldProperties;
+            outStr += `${sanitizeName(schema.name)}: ${arraySchema.of.length === 0 ? getTSTypeName(arraySchema.of[0]) : `(${arraySchema.of.map(itm => getTSTypeName(itm)).join(" | ")})`}[];\n`;
+        } else {
+            outStr += `${sanitizeName(schema.name)}: ${getTSTypeName(schema.type)};\n`;
+        }
+        if (isRoot) {
+            outStr += `}\n`;
+        }
+        return outStr;
+};
+
+
 const exportSanitySchema = (
   schema: SanityFieldProperties,
   isRoot = true,
@@ -288,7 +348,11 @@ const exportSanitySchema = (
       "_",
       "",
     )} = () => client.fetch(${schemaName.toUpperCase()}_QUERY)\n`;
+
+    outStr += "\n\n";
+    outStr += exportTSInterface(schema);
   }
+
 
   return outStr;
 };
@@ -351,7 +415,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
   const out = <>
       <Form isRoot={isRoot} onSubmit={handleSubmit(onSubmit)}>
         <Typography variant="h4">
-          {getValues().name || isRoot ? "Schema Editor" : "New Field"} {formState.isDirty ? "*" : ""}
+          {getValues().name || (isRoot ? "Schema Editor" : "New Field")} {formState.isDirty ? "*" : ""}
         </Typography>
         <br/>
         <Controller
