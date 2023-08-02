@@ -84,6 +84,15 @@ interface SanityReferenceFieldProperties extends SanityFieldProperties {
   to: Array<SanityFieldType | string>;
 }
 
+interface SanityArrayFieldProperties extends SanityFieldProperties {
+    type: "Array";
+    of: Array<SanityFieldType | string>;
+    options: {
+        layout: "grid" | "tags" | "list";
+        sortable: boolean;
+    }
+}
+
 const exportQuery = (schema: SanityFieldProperties, isRoot = true): string => {
   let query = "";
   if (isRoot) {
@@ -103,6 +112,12 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true): string => {
       query += `${to},`;
       query +=
         "// TODO: Add query for reference type, unsupported by codegen.\n";
+    }
+  } else if (schema.type === "Array") {
+    const arraySchema = schema as SanityArrayFieldProperties;
+    for (const of of arraySchema.of) {
+      query += `${of},\n`;
+      query += "// TODO: Add query for array type, unsupported by codegen.\n";
     }
   }
   if (isRoot) {
@@ -227,7 +242,27 @@ const exportSanitySchema = (
 
     outStr += `],\n`;
     outStr += typeDefEnd;
-  } else {
+  }  else if (schema.type === "Array"){
+    const arraySchema = schema as SanityArrayFieldProperties;
+    outStr += getBaseTypeDef(schema, isRoot);
+    outStr += `      of: [`;
+    arraySchema.of.forEach((ref, index) => {
+      if (index > 0) outStr += `, `;
+      outStr += `{type: '${ref.toLowerCase()}'}`;
+    });
+    outStr += `],\n`;
+    if(arraySchema.options){
+      outStr += `      options: {\n`;
+        if(arraySchema.options.layout){
+            outStr += `        layout: '${arraySchema.options.layout}',\n`;
+        }
+        if(arraySchema.options.sortable){
+          outStr += `        sortable: ${arraySchema.options.sortable},\n`;
+        }
+        outStr += `      },\n`;
+    }
+    outStr += typeDefEnd;
+  }else {
     outStr += getBaseTypeDef(schema, isRoot);
     outStr += typeDefEnd;
   }
@@ -467,6 +502,55 @@ const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
           </>
+        )}
+
+        {type === "Array" && (
+            <>
+                <Controller
+                    { /*@ts-ignore -- we know fields is on getValues() because type === 'Array'*/ ...{} }
+                    name="of"
+                    control={control}
+                    { /*@ts-ignore -- we know to is on getValues() because type === 'Array'*/ ...{} }
+                    defaultValue={["Object"]}
+                    render={({ field }) => (
+                        <Select multiple {...field} title="Of" label="Of">
+                            {allObjectNames.map((name) => (
+                                <MenuItem key={name} value={name}>
+                                    {name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    )}
+                />
+                <br />
+                <Controller
+                    { /*@ts-ignore -- we know sortable is on getValues() because type === 'Array'*/ ...{} }
+                    name="options.sortable"
+                    control={control}
+                    defaultValue={false}
+                    render={({ field }) => (
+                        <FormControlLabel
+                            control={<Checkbox {...field} />}
+                            label="Sortable"
+                        />
+                    )}
+                />
+                <br />
+                <Controller
+                    { /*@ts-ignore -- we know min is on getValues() because type === 'Array'*/ ...{} }
+                    name="options.layout"
+                    control={control}
+                    defaultValue="grid"
+                    render={({ field }) => (
+                        <Select {...field} title="Layout" label="Layout">
+                            <MenuItem value="grid">Grid</MenuItem>
+                            <MenuItem value="list">List</MenuItem>
+                            <MenuItem value="tags">Tags</MenuItem>
+                        </Select>
+                    )}
+                />
+                <br />
+                </>
         )}
 
         {type === "Object" && (
