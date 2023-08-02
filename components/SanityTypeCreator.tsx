@@ -262,7 +262,7 @@ const Form = styled.form<{ isRoot?: boolean }>`
   flex-direction: column;
   gap: 0.25rem;
   margin-top: 25px;
-  width: ${({ isRoot }) => (isRoot ? "clamp(300px, 100vw, 1200px);" : "300px")};
+  width: ${({ isRoot }) => (isRoot ? "clamp(300px, 80vw, 650px);" : "300px")};
 `;
 
 const Horizontal = styled.div`
@@ -272,11 +272,6 @@ const Horizontal = styled.div`
   align-items: center;
 `;
 
-const ResponsiveGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-`;
 interface FormFieldProps {
   onSubmit: (formState: SanityFieldProperties) => void;
   defaultValues: SanityFieldProperties;
@@ -476,6 +471,10 @@ const FieldForm: React.FC<FormFieldProps> = ({
 
         {type === "Object" && (
           <>
+            <Button variant="outlined" onClick={() => append({})}>
+              Add Field
+            </Button>
+            <br />
             <Grid
               container
               spacing={{ xs: 1, md: 2 }}
@@ -502,10 +501,6 @@ const FieldForm: React.FC<FormFieldProps> = ({
               ))}
             </Grid>
 
-            <Button variant="outlined" onClick={() => append({})}>
-              Add Field
-            </Button>
-            <br />
           </>
         )}
 
@@ -555,8 +550,8 @@ export const SanityTypeCreator = () => {
         onSubmit={(data) => saveFiles(data)}
         defaultValues={{
           type: "Object",
-          name: "New Type",
-          title: "New type",
+          name: "",
+          title: "",
           description: "",
           readOnly: false,
           hidden: false,
