@@ -728,7 +728,7 @@ export const SanityTypeCreator = () => {
       />
       <SpeedDial
           ariaLabel="Quick Menu"
-          sx={{ position: 'absolute', bottom: "2rem", right: "2rem" }}
+          sx={{ position: 'fixed', bottom: "2rem", right: "2rem" }}
           icon={<SpeedDialIcon />}
       >
             <SpeedDialAction
