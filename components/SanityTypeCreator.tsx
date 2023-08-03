@@ -423,10 +423,6 @@ const FieldForm: React.FC<FormFieldProps> = ({
   // @ts-ignore
   const out = <>
       <Form isRoot={isRoot} onSubmit={handleSubmit(onSubmit)}>
-        <Typography variant="h4">
-          {getValues().name || (isRoot ? "Schema Editor" : "New Field")} {formState.isDirty ? "*" : ""}
-        </Typography>
-        <br/>
         <Controller
           name="name"
           control={control}
@@ -461,7 +457,11 @@ const FieldForm: React.FC<FormFieldProps> = ({
                 target="_blank"
                 rel="noreferrer"
               >
-                <FaQuestionCircle />
+                <Tooltip title={"Documentation page"} arrow>
+                <Button onClick={()=>{}} variant={"text"}>
+                  <FaQuestionCircle />
+                </Button>
+                </Tooltip>
               </a>
             </Horizontal>
           )}
@@ -649,6 +649,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
 
               {fields.map((field, index) => (
                     <FieldForm
+                        key={field.id}
                         extraButtons={  <Button onClick={() => remove(index)}>Remove</Button>}
                       isRoot={false}
                       { /*@ts-ignore -- we know fields is on getValues() because type === 'Object'*/ ...{} }
