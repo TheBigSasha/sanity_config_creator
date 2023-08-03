@@ -732,7 +732,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
           name="name"
           control={control}
           defaultValue=""
-          render={({ field }) => <TextField {...field} label="Name" />}
+          render={({ field }) => <TextField {...field} label="Field Name (record key)" />}
         />
         <br />
         <Controller
