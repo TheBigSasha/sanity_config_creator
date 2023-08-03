@@ -7,14 +7,16 @@ import {
   Select,
   TextField,
   Button,
+  Tooltip,
   MenuItem,
-  Grid,
   Paper,
-  Card,
-  Typography, SpeedDial, SpeedDialIcon, SpeedDialAction,
+  Typography, SpeedDial, SpeedDialIcon, SpeedDialAction, Accordion,
 } from "@mui/material";
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+
 import styled from "styled-components";
-import { FaGithub, FaJs, FaQuestionCircle, FaSave, FaUndo} from "react-icons/fa";
+import {FaChevronDown, FaPlus, FaGithub, FaJs, FaQuestionCircle, FaSave, FaUndo} from "react-icons/fa";
 import styles from "../styles/Home.module.css";
 
 type SanityFieldType =
@@ -382,11 +384,13 @@ interface FormFieldProps {
   onSubmit: (formState: SanityFieldProperties) => void;
   defaultValues: SanityFieldProperties;
   isRoot?: boolean;
+  extraButtons?: React.ReactNode;
 }
 const FieldForm: React.FC<FormFieldProps> = ({
   onSubmit,
   defaultValues,
   isRoot,
+    extraButtons,
 }) => {
   const { handleSubmit, control, getValues, formState } =
     useForm<SanityFieldProperties>({
@@ -626,50 +630,61 @@ const FieldForm: React.FC<FormFieldProps> = ({
 
         {type === "Object" || type === "Document" && (
           <>
-            <Button variant="outlined" onClick={() => append({})}>
-              Add Field
-            </Button>
-            <br />
-            <Grid
-              container
-              spacing={{ xs: 1, md: 2 }}
-              columns={{ xs: 2, sm: 3, md: 4 }}
-              justifyContent="center"
-            >
+            <div>
+              <Typography variant="h6">
+                {fields.length === 0 ? "Empty Object" : "Fields"}
+                    <Tooltip title="Add Field">
+                      <Button variant="text" onClick={() => append({})}>
+                    <FaPlus/>
+                  </Button>
+                </Tooltip>
+              </Typography>
+
               {fields.map((field, index) => (
-                <Grid xs="auto" item key={field.id}>
-                  <Card
-                    sx={{ width: "300px", height: "min-content" }}
-                    key={field.id}
-                  >
                     <FieldForm
+                        extraButtons={  <Button onClick={() => remove(index)}>Remove</Button>}
                       isRoot={false}
                       { /*@ts-ignore -- we know fields is on getValues() because type === 'Object'*/ ...{} }
                       defaultValues={getValues().fields[index]}
                       onSubmit={(data) => {
                         update(index, data);
                       }}
-                    />{" "}
-                    <Button onClick={() => remove(index)}>Remove</Button>
-                  </Card>
-                </Grid>
+                    />
               ))}
-            </Grid>
+            </div>
 
           </>
         )}
 
         <>
-          {isRoot && subButton}
+          <br/>
+          {isRoot &&
+          <Horizontal>
+            {isRoot && subButton}
+            {isRoot && extraButtons}
+          </Horizontal>
+          }
           <br />
         </>
       </Form>
-      {!isRoot && subButton}
-      </>
+      {!isRoot &&
+    <Horizontal>
+      {subButton}
+      {extraButtons}
+    </Horizontal>
+      }
+</>
 
 
   if(!isRoot) {
-    return out;
+    return <Accordion>
+      <AccordionSummary expandIcon={<FaChevronDown/>}>
+        <Typography>{getValues().name || (isRoot ? "Schema Editor" : "New Field")} {formState.isDirty ? "*" : ""}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {out}
+        </AccordionDetails>
+    </Accordion>
   }
 
   return  <main className={styles.main}><Paper> {out} </Paper></main>
