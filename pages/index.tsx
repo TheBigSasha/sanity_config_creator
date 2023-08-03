@@ -17,7 +17,7 @@ const Home: NextPage = () => {
       </Head>
 
       <header>
-        <h3 className={styles.title}>
+        <h3 className={styles.title} style={{pointerEvents: "all"}}>
           Code Genreator for <a href="https://www.sanity.io">Sanity CMS</a>
         </h3>
       </header>

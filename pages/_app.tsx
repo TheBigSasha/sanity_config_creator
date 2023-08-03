@@ -19,6 +19,7 @@ export const SBackground = styled.span`
   height: 100%;
   background-color: rgb(0,0,0);
   z-index: -1;
+  pointer-events: all;
 `
 
 
@@ -32,9 +33,10 @@ function MyApp({ Component, pageProps }: AppProps) {
                 auraColor={'rgba(137,255,242,0.64)'}
                 background={'rgb(0,0,0)'}
                 dotColor={'rgb(50,50,50)'}
-                ambient={0.15}
-                dotSize={1}
+                ambient={0.3}
+                dotSize={2}
                 dotOpacity={0.6}
+                dotsBelow={true}
                 style={{ position: 'fixed', top: 0, left: 0 }}
             />
         </SBackground>

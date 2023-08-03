@@ -930,7 +930,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
     return (
       <Accordion>
         <AccordionSummary expandIcon={<FaChevronDown />}>
-          {getIconForField(getValues(), () => DEFAULT_DATA)}
+          {getIconForField(getValues())}
           <div style={{ width: "1rem" }} />
           <Typography>
             {getValues().name || (isRoot ? "Schema Editor" : "New Field")}{" "}
@@ -1019,6 +1019,7 @@ const ResponsiveGrid = styled.div`
   max-width: 100%;
   overflow: auto;
   min-height: calc(100vh - 12rem);
+  pointer-events: none;
 `;
 
 const DEFAULT_DATA: SanityDocumentFieldProperties = {

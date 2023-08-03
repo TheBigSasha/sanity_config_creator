@@ -10,6 +10,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  pointer-events: none;
+}
+
+.main * {
+  pointer-events: auto;
 }
 
 .footer {
@@ -19,6 +24,7 @@
   border-top: 1px solid #eaeaea;
   justify-content: center;
   align-items: center;
+  pointer-events: none;
 }
 
 .footer a {
@@ -26,6 +32,7 @@
   justify-content: center;
   align-items: center;
   flex-grow: 1;
+  pointer-events: auto;
 }
 
 .title a {
