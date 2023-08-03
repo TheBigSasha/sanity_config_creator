@@ -405,6 +405,7 @@ const exportSanitySchema = (
   }
 
   if (isRoot) {
+    //TODO: - Rich text and other types query generation improvements
     const schemaName = sanitizeName(schema.name);
     if (hasSlug(schema)) {
       outStr += "\n\n";
