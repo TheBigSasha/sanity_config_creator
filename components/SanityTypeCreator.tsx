@@ -785,7 +785,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
           defaultValue={false}
           render={({ field }) => (
             <FormControlLabel
-              control={<Checkbox {...field} />}
+              control={<Checkbox {...field} checked={field.value} />}
               label="Hidden"
             />
           )}
@@ -797,7 +797,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
           defaultValue={false}
           render={({ field }) => (
             <FormControlLabel
-              control={<Checkbox {...field} />}
+              control={<Checkbox {...field} checked={field.value}  />}
               label="Read Only"
             />
 
@@ -814,7 +814,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} />}
+                  control={<Checkbox {...field} checked={field.value}  />}
                   label="Use Pre-defined Strings (enum)"
                 />
               )}
@@ -843,7 +843,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} />}
+                  control={<Checkbox {...field} checked={field.value}  />}
                   label="Hotspot"
                 />
               )}
@@ -876,7 +876,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} />}
+                  control={<Checkbox {...field} checked={field.value}  />}
                   label="Caption"
                 />
               )}
@@ -889,7 +889,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} />}
+                  control={<Checkbox {...field} checked={field.value}  />}
                   label="Alt"
                 />
               )}
@@ -924,7 +924,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} />}
+                  control={<Checkbox {...field} checked={field.value}  />}
                   label="Weak"
                 />
               )}
@@ -959,7 +959,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} />}
+                  control={<Checkbox {...field} checked={field.value}  />}
                   label="Sortable"
                 />
               )}
