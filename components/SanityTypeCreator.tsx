@@ -386,12 +386,14 @@ interface FormFieldProps {
   defaultValues: SanityFieldProperties;
   isRoot?: boolean;
   extraButtons?: React.ReactNode;
+  topBar?: React.ReactNode;
 }
 const FieldForm: React.FC<FormFieldProps> = ({
   onSubmit,
   defaultValues,
   isRoot,
     extraButtons,
+    topBar,
 }) => {
   const { handleSubmit, control, getValues, formState } =
     useForm<SanityFieldProperties>({
@@ -426,6 +428,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
   // @ts-ignore
   const out = <>
       <Form isRoot={isRoot} onSubmit={handleSubmit(onSubmit)}>
+        {topBar}
         {(isRoot && type === "Object") && <> <Alert severity="info">   <AlertTitle>Top Level Object Type</AlertTitle>
           By default, object types can not be represented as standalone documents in the data store. If you want to define an object type that you'd like to be represented as a document with an id, revision and created and updated timestamps, you should define it using the document type instead. Apart from these additional fields, there's no semantic difference between a document and an object. <a href={"https://www.sanity.io/docs/object-type"}> Learn more</a></Alert>  <br/> </>}
         <Controller
@@ -760,6 +763,18 @@ const saveJsons = (fp: SanityFieldProperties[]) => {
 
   URL.revokeObjectURL(url);
 }
+
+const ResponsiveGrid = styled.div` 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    grid-gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    min-height: calc(100vh - 12rem);
+`;
+
 const DEFAULT_DATA: SanityDocumentFieldProperties = {
   type: "Document",
   name: "",
@@ -770,18 +785,29 @@ const DEFAULT_DATA: SanityDocumentFieldProperties = {
   hidden: false,
 };
 
+const LeftRight = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+`;
+
 export const SanityTypeCreator = () => {
   const [ datas, setDatas ] = useState<SanityFieldProperties[]>([DEFAULT_DATA])
 
   return (
     <>
+      <ResponsiveGrid>
+
       {datas.map((data, index) => (
           <FieldForm
+              topBar={<LeftRight><Typography variant={"h6"}>{data.title || "Untitled Entry"}</Typography> {datas.length > 1 && <Button onClick={() => setDatas(datas.filter((_, i) => i !== index))}>Remove</Button>}</LeftRight>}
               isRoot
               onSubmit={(dta) => {const newDta = [...datas]; newDta[index] = dta; setDatas(newDta); saveTs(dta);}}
               defaultValues={data}
           />
         ))}
+      </ResponsiveGrid>
 
       <SpeedDial
           ariaLabel="Quick Menu"
