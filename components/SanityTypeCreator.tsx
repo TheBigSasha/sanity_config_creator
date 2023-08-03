@@ -46,6 +46,7 @@ import {
   VscSymbolMethod,
   VscSaveAll,
   VscNewFile,
+  VscTrash,
 } from "react-icons/vsc";
 import {
   BsCalendarDate,
@@ -106,13 +107,26 @@ type SanityFieldProperties = {
   readOnly: boolean;
 };
 
+interface SanityStringFieldProperties extends SanityFieldProperties {
+  name: "String";
+  options: {
+    list: Array<{title: string, value: string}>; // for pre defined strings
+  };
+  internalConfig: { // not sanity properties, but properties for use in code generation
+    predefined: boolean;
+  }
+}
+
 const getIconForField = (field: SanityFieldProperties | string): React.ReactNode => {
   const type = typeof field === "string" ? field : field.type;
   switch(type){
     case "Array":
       const arrayField = field as SanityArrayFieldProperties;
+      if (typeof field !== "string" && arrayField.of && arrayField.of.length === 1 && arrayField.of[0] === "Block") {
+        return <VscSymbolKeyword/>;
+      }
       if (typeof field === "string"  || !arrayField.of || arrayField.of.length === 0) {0
-        return <VscSymbolArray/>
+        return <VscSymbolArray/>;
       }
       return <>[{arrayField.of.map(typ => getIconForField(typ))}]</>;
     case "Block":
@@ -400,6 +414,57 @@ const exportTSInterface = (
   }
   return outStr;
 };
+
+const PreDefinedStringsForm: React.FC<{control: any}> = ({control}) => {
+  // form to edit list of predefined strings
+
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: "options.list",
+  });
+
+  return (
+    <>
+      <Button
+        onClick={() => {
+          append({title: "", value: ""});
+        }}
+        variant={"contained"}
+      >
+        <FaPlus /> Add Predefined String
+      </Button>
+      <br />
+      {fields.map((field, index) => {
+        return (
+          <Horizontal key={field.id}>
+            <Controller
+              name={`options.list.${index}.title`}
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextField {...field} label="Title" />}
+            />
+            {" - "}
+            <Controller
+              name={`options.list.${index}.value`}
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextField {...field} label="Value" />}
+            />
+            <Button
+              onClick={() => {
+                remove(index);
+              }}
+              variant={"outlined"}
+            >
+              <VscTrash/>
+            </Button>
+          </Horizontal>
+        );
+      })}
+    </>
+  );
+}
+
 
 const exportSanitySchema = (
   schema: SanityFieldProperties,
@@ -715,6 +780,35 @@ const FieldForm: React.FC<FormFieldProps> = ({
           )}
         />
         <br />
+
+        { type === "String" && (
+            <>
+             <Controller
+              {/*@ts-ignore -- we know fields is on getValues() because type === 'String'*/ ...{} }
+              name="internalConfig.predefined"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Checkbox {...field} />}
+                  label="Use Pre-defined Strings (enum)"
+                />
+              )}
+            />
+            <br />
+            {
+              /*@ts-ignore -- we know fields is on getValues() because type === 'String'*/ 
+              getValues().internalConfig?.predefined && (
+                <PreDefinedStringsForm
+                  control={control}
+                  />
+
+              )
+              
+            }
+              <br />
+            </>
+        )}
 
         {type === "Image" && (
           <>
