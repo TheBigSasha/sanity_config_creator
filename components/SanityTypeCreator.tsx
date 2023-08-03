@@ -338,9 +338,9 @@ const getBaseTypeDef = (
   isRoot = false,
 ): string => {
   let outStr = isRoot ? "defineType" : "defineField";
-  outStr += `({\n      type: '${isDefaultSanityType(schema.type) ? schema.type.toLowerCase() : schema.type}',\n      name: '${schema.name}',\n      title: '${schema.title}',\n`;
+  outStr += `({\n      type: '${isDefaultSanityType(schema.type) ? schema.type.toLowerCase() : schema.type}',\n      name: ${JSON.stringify(schema.name)},\n      title: ${JSON.stringify(schema.title)},\n`;
   if (schema.description)
-    outStr += `      description: '${schema.description}',\n`;
+    outStr += `      description: ${JSON.stringify(schema.description)},\n`;
   if (schema.hidden) outStr += `      hidden: ${schema.hidden},\n`;
   if (schema.readOnly) outStr += `      readOnly: ${schema.readOnly},\n`;
   return outStr;
@@ -355,7 +355,7 @@ const getTSTypeName = (type: SanityFieldType | string, arrayType?: string[]): st
     case "Array":
       return `Array<${arrayType ? arrayType.map(type => getTSTypeName(type)).join(" | ") : "any"}>`;
     case "Block":
-      return "Block";
+      return "PortableTextBlock";
     case "Boolean":
       return "boolean";
     case "Date":
@@ -375,13 +375,13 @@ const getTSTypeName = (type: SanityFieldType | string, arrayType?: string[]): st
     case "Object":
       return "Object";
     case "Reference":
-      return "Reference";
+      return "Reference /* TODO: fix reference type */";
     case "Slug":
       return "Slug";
     case "String":
       return "string";
     case "Text":
-      return "RichText";
+      return "String";
     default:
       return isDefaultSanityType(type) ? type.toLowerCase() : sanitizeName(type);
   }
@@ -406,6 +406,13 @@ const exportTSInterface = (
         ? `Array<${getTSTypeName(arraySchema.of[0])}>`
         : `${getTSTypeName(arraySchema.type, arraySchema.of)}`
     };\n`;
+  } else if (schema.type === "String") {
+    const stringSchema = schema as SanityStringFieldProperties;
+    if (stringSchema.internalConfig?.predefined && stringSchema.options?.list){
+      outStr += `${sanitizeName(schema.name)}: ${stringSchema.options.list.map(listItem => `"${listItem.value}"`).join(" | ")};\n`;
+    }else{
+      outStr += `${sanitizeName(schema.name)}: ${getTSTypeName(schema.type)};\n`;
+    }
   } else {
     outStr += `${sanitizeName(schema.name)}: ${getTSTypeName(schema.type)};\n`;
   }
@@ -560,6 +567,23 @@ const exportSanitySchema = (
         outStr += `        sortable: ${arraySchema.options.sortable},\n`;
       }
       outStr += `      },\n`;
+    }
+    outStr += typeDefEnd;
+  } else if (schema.type === "String") {
+    outStr += getBaseTypeDef(schema, isRoot);
+    const stringSchema = schema as SanityStringFieldProperties;
+    if (stringSchema.options && stringSchema.internalConfig){
+      if (stringSchema.internalConfig.predefined && stringSchema.options.list){
+        outStr += `      options: {\n`;
+        outStr += `        list: [\n`;
+        stringSchema.options.list.forEach((listItem, index) => {
+          if (index > 0) outStr += `, `;
+          outStr += `{title: '${listItem.title}', value: '${listItem.value}'}`;
+        }
+        );
+        outStr += `],\n`;
+        outStr += `      },\n`;
+      }
     }
     outStr += typeDefEnd;
   } else {
