@@ -29,7 +29,7 @@ import {
   FaJs,
   FaQuestionCircle,
   FaSave,
-  FaUndo,
+  FaUndo, FaTruckLoading,
 } from "react-icons/fa";
 import styles from "../styles/Home.module.css";
 import { CODEGEN_MESSAGE } from "../constants/CodegenMessage";
@@ -136,14 +136,14 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true): string => {
       query +=
         "// TODO: Add query for reference type, unsupported by codegen.\n";
     }
-  } else if (schema.type === "Array") {
+  }   else if (schema.type === "Array") {
     const arraySchema = schema as SanityArrayFieldProperties;
-    for (const of of arraySchema.of) {
-      query += `${of},\n`;
-      query += "// TODO: Add query for array type, unsupported by codegen.\n";
-    }
+    for (const ofType of arraySchema.of) {
+      query += `${ofType},`;
   }
-  if (isRoot) {
+}
+
+if (isRoot) {
     query += "}";
   }
   return query;
@@ -194,12 +194,16 @@ const hasSlug = (schema: SanityFieldProperties): boolean => {
   return false;
 };
 
+const isDefaultSanityType = (type: SanityFieldType | string): boolean => {
+    return SanityFieldTypes.includes(type);
+}
+
 const getBaseTypeDef = (
   schema: SanityFieldProperties,
   isRoot = false,
 ): string => {
   let outStr = isRoot ? "defineType" : "defineField";
-  outStr += `({\n      type: '${schema.type}',\n      name: '${schema.name}',\n      title: '${schema.title}',\n`;
+  outStr += `({\n      type: '${isDefaultSanityType(schema.type) ? schema.type.toLowerCase() : schema.type}',\n      name: '${schema.name}',\n      title: '${schema.title}',\n`;
   if (schema.description)
     outStr += `      description: '${schema.description}',\n`;
   if (schema.hidden) outStr += `      hidden: ${schema.hidden},\n`;
@@ -208,13 +212,13 @@ const getBaseTypeDef = (
 };
 
 const sanitizeName = (name: string): string => {
-  return name.replace(" ", "_").replace("[^a-zA-Z0-9_]", "");
+  return name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9_]", "");
 };
 
-const getTSTypeName = (type: SanityFieldType | string): string => {
+const getTSTypeName = (type: SanityFieldType | string, arrayType?: string[]): string => {
   switch (type) {
     case "Array":
-      return "Array<any>";
+      return `Array<${arrayType ? arrayType.map(type => getTSTypeName(type)).join(" | ") : "any"}>`;
     case "Block":
       return "Block";
     case "Boolean":
@@ -244,7 +248,7 @@ const getTSTypeName = (type: SanityFieldType | string): string => {
     case "Text":
       return "RichText";
     default:
-      return "any";
+      return isDefaultSanityType(type) ? type.toLowerCase() : sanitizeName(type);
   }
 };
 
@@ -264,9 +268,9 @@ const exportTSInterface = (
     const arraySchema = schema as SanityArrayFieldProperties;
     outStr += `${sanitizeName(schema.name)}: ${
       arraySchema.of.length === 0
-        ? getTSTypeName(arraySchema.of[0])
-        : `(${arraySchema.of.map((itm) => getTSTypeName(itm)).join(" | ")})`
-    }[];\n`;
+        ? `Array<${getTSTypeName(arraySchema.of[0])}>`
+        : `${getTSTypeName(arraySchema.type, arraySchema.of)}`
+    };\n`;
   } else {
     outStr += `${sanitizeName(schema.name)}: ${getTSTypeName(schema.type)};\n`;
   }
@@ -362,7 +366,7 @@ const exportSanitySchema = (
       outStr += `export const ${schemaName.toUpperCase()}_BY_SLUG_QUERY = groq\`\n${exportBySlugQuery(
         schema,
       )}\n\`\n`;
-      outStr += `export const get${schemaName.replace(
+      outStr += `export const get${schemaName.replaceAll(
         "_",
         "",
       )}BySlug = (slug: string) => client.fetch(${schemaName.toUpperCase()}_BY_SLUG_QUERY, { slug })\n`;
@@ -371,7 +375,7 @@ const exportSanitySchema = (
     outStr += `export const ${schemaName.toUpperCase()}_QUERY = groq\`\n${exportQuery(
       schema,
     )}\n\`\n`;
-    outStr += `export const get${schemaName.replace(
+    outStr += `export const get${schemaName.replaceAll(
       "_",
       "",
     )} = () => client.fetch(${schemaName.toUpperCase()}_QUERY)\n`;
@@ -938,7 +942,7 @@ const SanityTypeCreatorRaw = () => {
 
         <SpeedDialAction
           icon={<FaJs />}
-          tooltipTitle={"Save Generated Code (.ts)"}
+          tooltipTitle={"Save All Generated Code (.ts)"}
           onClick={() => {
             saveTses(datas);
           }}
@@ -946,7 +950,7 @@ const SanityTypeCreatorRaw = () => {
 
         <SpeedDialAction
           icon={<FaSave />}
-          tooltipTitle={"Save Entry (.json)"}
+          tooltipTitle={"Save Project (.json)"}
           onClick={() => {
             saveJsons(datas);
           }}
@@ -961,6 +965,39 @@ const SanityTypeCreatorRaw = () => {
                 "https://github.com/TheBigSasha/sanity_config_creator",
               );
           }}
+        />
+
+        <SpeedDialAction
+            icon={<FaTruckLoading />}
+            tooltipTitle={"Import from JSON"}
+            onClick={() => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = "application/json";
+                input.onchange = (e) => {
+                    const files = (e.target as HTMLInputElement).files;
+                    if (files && files.length > 0) {
+                        const file = files[0];
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const contents = e.target?.result;
+                            if (typeof contents === "string") {
+                                try {
+                                    const parsed = JSON.parse(contents);
+                                    if (Array.isArray(parsed)) {
+                                        setDatas(parsed);
+                                    }
+                                } catch (e) {
+                                    console.error(e);
+                                }
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                input.click();
+            }
+            }
         />
 
         <SpeedDialAction
