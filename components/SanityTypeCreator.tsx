@@ -628,13 +628,20 @@ const FieldForm: React.FC<FormFieldProps> = ({
                 </>
         )}
 
-        {type === "Object" || type === "Document" && (
+        {(type === "Object" || type === "Document") && (
           <>
             <div>
               <Typography variant="h6">
-                {fields.length === 0 ? "Empty Object" : "Fields"}
+                {fields.length === 0 ? "No Fields" : "Fields"}
                     <Tooltip title="Add Field">
-                      <Button variant="text" onClick={() => append({})}>
+                      <Button variant="text" onClick={() => append({
+                            name: "",
+                            title: "",
+                            type: "String",
+                            description: "",
+                            hidden: false,
+                            readOnly: false,
+                      })}>
                     <FaPlus/>
                   </Button>
                 </Tooltip>
