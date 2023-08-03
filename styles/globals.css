@@ -27,5 +27,6 @@ a {
 }
 
 #__next {
+  /* TODO: pass thru mouse to background hover effect without breaking mui select */
   /* pointer-events: none; */
 }
