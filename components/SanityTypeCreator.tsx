@@ -1,7 +1,6 @@
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
-  Box,
   Checkbox,
   FormControlLabel,
   Select,
@@ -25,14 +24,38 @@ import styled from "styled-components";
 import {
   FaChevronDown,
   FaPlus,
-  FaGithub,
-  FaJs,
   FaQuestionCircle,
-  FaSave,
-  FaUndo, FaTruckLoading,
 } from "react-icons/fa";
+import {
+  HiOutlineDocumentText
+} from "react-icons/hi";
+import {
+  VscSymbolArray,
+  VscSymbolBoolean,
+  VscSymbolFile,
+  VscSymbolNumeric,
+  VscSymbolKeyword,
+  VscSymbolString,
+  VscListTree,
+  VscNote,
+  VscLink,
+  VscKey,
+  VscPackage,
+  VscReferences,
+  VscLocation,
+  VscSymbolMethod,
+  VscSaveAll,
+  VscNewFile,
+} from "react-icons/vsc";
+import {
+  BsCalendarDate,
+  BsCardImage,
+  BsFiletypeJson,
+  BsUpload
+} from "react-icons/bs";
 import styles from "../styles/Home.module.css";
 import { CODEGEN_MESSAGE } from "../constants/CodegenMessage";
+import { UnchoosableTypes } from "../constants/UnchoosableTypes";
 
 type SanityFieldType =
   | "Array"
@@ -73,6 +96,7 @@ const SanityFieldTypes = [
   "URL",
 ];
 
+
 type SanityFieldProperties = {
   name: string;
   type: SanityFieldType;
@@ -81,6 +105,53 @@ type SanityFieldProperties = {
   hidden: boolean;
   readOnly: boolean;
 };
+
+const getIconForField = (field: SanityFieldProperties | string): React.ReactNode => {
+  const type = typeof field === "string" ? field : field.type;
+  switch(type){
+    case "Array":
+      const arrayField = field as SanityArrayFieldProperties;
+      if (typeof field === "string"  || !arrayField.of || arrayField.of.length === 0) {0
+        return <VscSymbolArray/>
+      }
+      return <>[{arrayField.of.map(typ => getIconForField(typ))}]</>;
+    case "Block":
+      return <VscSymbolKeyword/>;
+      case "Boolean":
+      return <VscSymbolBoolean/>;
+      case "Date":
+      return <BsCalendarDate/>;
+      case "Datetime":
+      return <BsCalendarDate/>;
+      case "Document":
+      return <HiOutlineDocumentText />;
+      case "File":
+      return <VscSymbolFile/>;
+      case "Geopoint":
+      return <VscLocation/>;
+      case "Image":
+      return <BsCardImage/>;
+      case "Number":
+      return <VscSymbolNumeric/>;
+      case "Object":
+      return <VscPackage/>;
+      case "Reference":
+      return <VscReferences/>;
+      case "Slug":
+      return <VscKey/>;
+      case "String":
+      return <VscSymbolString/>;
+      case "Span":
+      return <VscListTree/>;
+      case "Text":
+      return <VscNote/>;
+      case "URL":
+      return <VscLink/>;
+      default:
+        return <VscSymbolMethod/>;
+
+  }
+}
 
 interface SanityObjectFieldProperties extends SanityFieldProperties {
   type: "Object";
@@ -99,6 +170,10 @@ interface SanityImageFieldProperties extends SanityFieldProperties {
     accept: string;
     sources: string;
   };
+  internalConfig: { // not sanity properties, but properties for use in code generation
+    caption: boolean;
+    alt: boolean;
+  }
 }
 
 interface SanityReferenceFieldProperties extends SanityFieldProperties {
@@ -120,16 +195,18 @@ const getFields: (
     type: SanityFieldType | string,
     getTypeObjOfString: (name: string) => SanityFieldProperties
 ) => SanityFieldProperties[] = (type, getTypeObjOfString) => {
-    if (isDefaultSanityType(type)) {
-        return [];
-    }
     const typeObj = getTypeObjOfString(type);
-    if (typeObj.type === "Object" || typeObj.type === "Document") {
+    if (typeObj.type === "Object" || typeObj.type === "Document" || (typeObj as SanityObjectFieldProperties)["fields"] != null) {
       const fieldsObj = typeObj as SanityObjectFieldProperties | SanityDocumentFieldProperties;
       return fieldsObj.fields;
     }
     return [];
 }
+
+const hasFields: (typeClass: SanityFieldProperties) => boolean = (typeClass) => {
+  return typeClass.type === "Object" || typeClass.type === "Document" || (typeClass as SanityObjectFieldProperties)["fields"] != null && (typeClass as SanityObjectFieldProperties)["fields"].length > 0;
+}
+
 
 const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfString: (name: string) => SanityFieldProperties): string => {
   let query = "";
@@ -139,7 +216,7 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfS
   if (isRoot) {
     query += `*[_type == "${sanitizeName(schema.name)}"]`;
   }
-  if(isRoot || schema.type === "Object" || schema.type === "Document") {
+  if(isRoot || hasFields(schema)) {
       query += "{\n";
   }
   if (!isDefaultSanityType(schema.type)) {
@@ -149,7 +226,7 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfS
     }
     query += "}\n";
   }
-  if (schema.type === "Object" || schema.type === "Document") {
+  if (hasFields(schema)) {
     const objectSchema = schema as SanityObjectFieldProperties;
     for (const field of objectSchema.fields) {
       query += `${sanitizeName(field.name)}`;
@@ -185,7 +262,7 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfS
       }
       query += "\n}";
 }
-  if(isRoot || schema.type === "Object" || schema.type === "Document") {
+  if(isRoot || hasFields(schema)) {
     query += "\n}";
   }
   return query;
@@ -303,7 +380,7 @@ const exportTSInterface = (
   let outStr = isRoot
     ? `export interface ${sanitizeName(schema.name)} {\n`
     : "";
-  if (schema.type === "Object" || schema.type === "Document") {
+  if (hasFields(schema)) {
     const objectSchema = schema as SanityObjectFieldProperties;
     objectSchema.fields.forEach((field) => {
       outStr += exportTSInterface(field, false);
@@ -335,7 +412,7 @@ const exportSanitySchema = (
     ? `import { defineField, defineType } from 'sanity'\n\n export default `
     : "";
 
-  if (schema.type === "Object" || schema.type === "Document") {
+  if (hasFields(schema)) {
     const objectSchema = schema as SanityObjectFieldProperties | SanityDocumentFieldProperties;
 
     outStr += getBaseTypeDef(schema, isRoot);
@@ -364,6 +441,27 @@ const exportSanitySchema = (
         outStr += `        sources: '${imageSchema.options.sources}',\n`;
       outStr += `      },\n`;
     }
+    if (imageSchema.internalConfig){
+      outStr += "fields: [\n";
+      if(imageSchema.internalConfig.caption){
+        outStr +=  `defineField({
+          title: 'Caption',
+          name: 'caption',
+          type: 'string',
+        }),\n`;
+    }
+    if(imageSchema.internalConfig.alt){
+      outStr += `defineField({
+        name: 'alt',
+        type: 'string',
+        title: 'Alt text',
+        description:
+          'Alternative text for screenreaders. Falls back on caption if not set',
+          validation: (rule) => rule.required().max(255).min(10),           
+      }),\n`;
+    }
+    outStr += `],\n`;
+  }
 
     outStr += typeDefEnd;
   } else if (schema.type === "Reference") {
@@ -500,9 +598,16 @@ const FieldForm: React.FC<FormFieldProps> = ({
     ...SanityFieldTypes,
     ...newlyCreatedObjectNames,
     ...customTypes,
-  ].flat();
+  ]
 
-  const validTypes: string[] = isRoot ? ["Document", "Object"] : allObjectNames;
+  const choosableObjectNames = allObjectNames.flat().filter(
+    // filter out UnchoosableTypes
+    (type) => !UnchoosableTypes.includes(type)
+  );
+
+
+
+  const validTypes: string[] = isRoot ? ["Document", "Object"] : choosableObjectNames;
 
   // @ts-ignore
   const out = (
@@ -606,6 +711,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               control={<Checkbox {...field} />}
               label="Read Only"
             />
+
           )}
         />
         <br />
@@ -645,6 +751,32 @@ const FieldForm: React.FC<FormFieldProps> = ({
               )}
             />
             <br />
+            <Controller
+              {/*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{} }
+              name="internalConfig.caption"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Checkbox {...field} />}
+                  label="Caption"
+                />
+              )}
+            />
+            <br />
+            <Controller
+              {/*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{} }
+              name="internalConfig.alt"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Checkbox {...field} />}
+                  label="Alt"
+                />
+              )}
+            />
+            <br />
           </>
         )}
 
@@ -658,7 +790,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={["Object"]}
               render={({ field }) => (
                 <Select multiple {...field} title="To" label="To">
-                  {allObjectNames.map((name) => (
+                  {choosableObjectNames.map((name) => (
                     <MenuItem key={name} value={name}>
                       {name}
                     </MenuItem>
@@ -692,7 +824,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               {/*@ts-ignore -- we know to is on getValues() because type === 'Array'*/ ...{} }
               defaultValue={["Object"]}
               render={({ field }) => (
-                <Select multiple {...field} title="Of" label="Of">
+                <Select multiple {...field} title="Of" label="Member Types">
                   {allObjectNames.map((name) => (
                     <MenuItem key={name} value={name}>
                       {name}
@@ -798,6 +930,8 @@ const FieldForm: React.FC<FormFieldProps> = ({
     return (
       <Accordion>
         <AccordionSummary expandIcon={<FaChevronDown />}>
+          {getIconForField(getValues(), () => DEFAULT_DATA)}
+          <div style={{ width: "1rem" }} />
           <Typography>
             {getValues().name || (isRoot ? "Schema Editor" : "New Field")}{" "}
             {formState.isDirty ? "*" : ""}
@@ -990,7 +1124,7 @@ const SanityTypeCreatorRaw = () => {
         icon={<SpeedDialIcon />}
       >
         <SpeedDialAction
-          icon={<FaPlus />}
+          icon={<VscNewFile />}
           tooltipTitle={"Add New Schema"}
           onClick={() => {
             setDatas([...datas, DEFAULT_DATA]);
@@ -998,7 +1132,7 @@ const SanityTypeCreatorRaw = () => {
         />
 
         <SpeedDialAction
-          icon={<FaJs />}
+          icon={<VscSaveAll />}
           tooltipTitle={"Save All Generated Code (.ts)"}
           onClick={() => {
             saveTses(datas, getTypeObjOfString);
@@ -1006,26 +1140,16 @@ const SanityTypeCreatorRaw = () => {
         />
 
         <SpeedDialAction
-          icon={<FaSave />}
+          icon={<BsFiletypeJson />}
           tooltipTitle={"Save Project (.json)"}
           onClick={() => {
             saveJsons(datas);
           }}
         />
 
-        <SpeedDialAction
-          icon={<FaGithub />}
-          tooltipTitle={"View on Github"}
-          onClick={() => {
-            typeof window !== "undefined" &&
-              window.open(
-                "https://github.com/TheBigSasha/sanity_config_creator",
-              );
-          }}
-        />
 
         <SpeedDialAction
-            icon={<FaTruckLoading />}
+            icon={<BsUpload />}
             tooltipTitle={"Import from JSON"}
             onClick={() => {
                 const input = document.createElement("input");
@@ -1055,12 +1179,6 @@ const SanityTypeCreatorRaw = () => {
                 input.click();
             }
             }
-        />
-
-        <SpeedDialAction
-          icon={<FaUndo />}
-          tooltipTitle={"Reset"}
-          onClick={() => setDatas([DEFAULT_DATA])}
         />
       </SpeedDial>
     </>

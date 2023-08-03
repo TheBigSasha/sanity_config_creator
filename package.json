@@ -21,7 +21,8 @@
     "react-hook-form-mui": "^6.4.2",
     "react-icons": "^4.10.1",
     "sanity": "^3.14.4",
-    "styled-components": "^6.0.5"
+    "styled-components": "^6.0.5",
+    "tbsui": "^0.4.1"
   },
   "devDependencies": {
     "@types/node": "20.4.5",
