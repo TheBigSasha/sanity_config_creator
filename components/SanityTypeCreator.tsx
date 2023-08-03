@@ -700,7 +700,6 @@ const FieldForm: React.FC<FormFieldProps> = ({
 };
 
 const saveTs = (fp: SanityFieldProperties) => {
-  // save a JSON file of the schema (JSON stringify) and sanity code (exportSanitySchema -> .ts)
   const ts = exportSanitySchema(fp, true);
 
   const blob2 = new Blob([ts], { type: "text/plain" });
@@ -713,6 +712,20 @@ const saveTs = (fp: SanityFieldProperties) => {
 
 
   URL.revokeObjectURL(url2);
+};
+
+const saveTses = (fp: SanityFieldProperties[]) => {
+  const tses = fp.map((f) => exportSanitySchema(f, true)).join(`\n\n// ------------------ ${f.title} \n\n`);
+
+    const blob2 = new Blob([tses], { type: "text/plain" });
+    const url2 = URL.createObjectURL(blob2);
+    const a2 = document.createElement("a");
+
+    a2.href = url2;
+    a2.download = `${fp.map((f) => sanitizeName(f.title)).join("-")}.ts`;
+    a2.click();
+
+    URL.revokeObjectURL(url2);
 };
 
 const saveJson = (fp: SanityFieldProperties) => {
@@ -729,7 +742,19 @@ const saveJson = (fp: SanityFieldProperties) => {
     URL.revokeObjectURL(url);
 }
 
+const saveJsons = (fp: SanityFieldProperties[]) => {
+  const json = JSON.stringify(fp, null, 2);
+  const blob = new Blob([json], { type: "text/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
 
+  a.href = url;
+  a.download = `${fp.map((f) => sanitizeName(f.title)).join("-")}.json`;
+  a.click();
+
+
+  URL.revokeObjectURL(url);
+}
 const DEFAULT_DATA: SanityDocumentFieldProperties = {
   type: "Document",
   name: "",
@@ -741,31 +766,43 @@ const DEFAULT_DATA: SanityDocumentFieldProperties = {
 };
 
 export const SanityTypeCreator = () => {
-  const [ data, setData ] = useState<SanityFieldProperties>(DEFAULT_DATA)
+  const [ datas, setDatas ] = useState<SanityFieldProperties[]>([DEFAULT_DATA])
+
   return (
     <>
-      <FieldForm
-        isRoot
-        onSubmit={(dta) => {setData(dta); saveTs(dta);}}
-        defaultValues={data}
-      />
+      {datas.map((data, index) => (
+          <FieldForm
+              isRoot
+              onSubmit={(dta) => {const newDta = [...datas]; newDta[index] = dta; setDatas(newDta); saveTs(dta);}}
+              defaultValues={data}
+          />
+        ))}
+
       <SpeedDial
           ariaLabel="Quick Menu"
           sx={{ position: 'fixed', bottom: "2rem", right: "2rem" }}
           icon={<SpeedDialIcon />}
       >
+        <SpeedDialAction
+            icon={<FaPlus/>}
+            tooltipTitle={"Add New Schema"}
+            onClick={() => {
+                setDatas([...datas, DEFAULT_DATA]);
+            }
+            }/>
+
             <SpeedDialAction
                 icon={<FaJs/>}
                 tooltipTitle={"Save Generated Code (.ts)"}
                 onClick={() => {
-                  saveTs(data);
+                  saveTses(datas);
                 }}/>
 
         <SpeedDialAction
             icon={<FaSave/>}
             tooltipTitle={"Save Entry (.json)"}
             onClick={() => {
-                saveJson(data);
+                saveJsons(datas);
             }}/>
 
 
@@ -780,7 +817,7 @@ export const SanityTypeCreator = () => {
           icon={<FaUndo/>}
             tooltipTitle={"Reset"}
             onClick={() =>
-              setData(DEFAULT_DATA)
+              setDatas([DEFAULT_DATA])
             }/>
 
 
