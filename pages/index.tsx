@@ -16,24 +16,24 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-        <header>
-            <h3 className={styles.title}>
-                Code Genreator for <a href="https://www.sanity.io">Sanity CMS</a>
-            </h3>
-        </header>
+      <header>
+        <h3 className={styles.title}>
+          Code Genreator for <a href="https://www.sanity.io">Sanity CMS</a>
+        </h3>
+      </header>
 
-        <SanityTypeCreator />
+      <SanityTypeCreator />
 
       <footer className={styles.footer}>
         <a href="https://sasharesume.com/">
-          <FaHome /> Alexander Aleshchenko
+          <FaHome /> {`Author's Homepage`}
         </a>{" "}
-        <a href={"https://github.com/TheBigSasha/RuntimeTester"}>
-          <FaChartLine /> Runtime Tester
+        <a href={"https://github.com/TheBigSasha/sanity_config_creator"}>
+          <FaChartLine /> Source Code
         </a>{" "}
         <a href={"https://www.youtube.com/@CS250"}>
           {" "}
-          <FaYoutube> </FaYoutube> COMP 250
+          <FaYoutube> </FaYoutube> {`Author's Intro to CS Videos`}
         </a>{" "}
         <a href={"https://www.npmjs.com/package/tbsui"}>
           <FaReact /> React Components
