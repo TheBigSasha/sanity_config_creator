@@ -221,12 +221,11 @@ const hasFields: (typeClass: SanityFieldProperties) => boolean = (typeClass) => 
   return typeClass.type === "Object" || typeClass.type === "Document" || (typeClass as SanityObjectFieldProperties)["fields"] != null && (typeClass as SanityObjectFieldProperties)["fields"].length > 0;
 }
 
+const needsRecursiveExport: (typeClass: SanityFieldProperties) => boolean = (field) => {
+  return field.type === "Object" || field.type === "File" || field.type === "Document" || field.type === "Array"  || !isDefaultSanityType(field.type)};
 
 const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfString: (name: string) => SanityFieldProperties): string => {
   let query = "";
-  console.dir(schema)
-  console.log(schema.type)
-  console.log("isRoot", isRoot)
   if (isRoot) {
     query += `*[_type == "${sanitizeName(schema.name)}"]`;
   }
@@ -244,7 +243,7 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfS
     const objectSchema = schema as SanityObjectFieldProperties;
     for (const field of objectSchema.fields) {
       query += `${sanitizeName(field.name)}`;
-      if (field.type === "Object" || field.type === "Document" || field.type === "Array" || !isDefaultSanityType(field.type)) {
+      if (needsRecursiveExport(field)) {
         query += exportQuery(field, false, getTypeObjOfString);
       }
       query += ",";
@@ -256,13 +255,21 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfS
       query +=
         "// TODO: Add query for reference type, unsupported by codegen.\n";
     }
-  }   else if (schema.type === "Array") {
+  } else if (schema.type === "File") {
+      query += "{\n";
+      query += `\n /* In order to download a file from your front-end you need to append ?dl=<filename-of-your-choice.pdf> to the file URL. If you leave the filename blank, the original filename will be used if present. */\n`;
+      query += `"url": file.asset->url,\n`;
+      query += `"originalFilename": file.asset->originalFilename,\n`;
+      query += `"extension": file.asset->extension,\n`;
+      query += `"size": file.asset->size,\n`;
+
+      query += "}\n";
+
+  } else if (schema.type === "Array") {
     const arraySchema = schema as SanityArrayFieldProperties;
-    console.log("arraySchema", arraySchema);
     query += "{\n";
 
       for (const ofType of arraySchema.of) {
-        console.log("ofType", ofType);
         if (!isDefaultSanityType(ofType) && getTypeObjOfString(ofType).name === DEFAULT_DATA.name) {
           query += `_type == '${sanitizeName(ofType)}' => { // TODO: Add selection of fields for ${ofType} },`;
         } else if (!isDefaultSanityType(ofType) && getTypeObjOfString(ofType).name !== DEFAULT_DATA.name) {
