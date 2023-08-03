@@ -116,18 +116,47 @@ interface SanityArrayFieldProperties extends SanityFieldProperties {
   };
 }
 
-const exportQuery = (schema: SanityFieldProperties, isRoot = true): string => {
+const getFields: (
+    type: SanityFieldType | string,
+    getTypeObjOfString: (name: string) => SanityFieldProperties
+) => SanityFieldProperties[] = (type, getTypeObjOfString) => {
+    if (isDefaultSanityType(type)) {
+        return [];
+    }
+    const typeObj = getTypeObjOfString(type);
+    if (typeObj.type === "Object" || typeObj.type === "Document") {
+      const fieldsObj = typeObj as SanityObjectFieldProperties | SanityDocumentFieldProperties;
+      return fieldsObj.fields;
+    }
+    return [];
+}
+
+const exportQuery = (schema: SanityFieldProperties, isRoot = true, getTypeObjOfString: (name: string) => SanityFieldProperties): string => {
   let query = "";
+  console.dir(schema)
+  console.log(schema.type)
+  console.log("isRoot", isRoot)
   if (isRoot) {
-    query += `*[_type == "${schema.name}"]{`;
+    query += `*[_type == "${sanitizeName(schema.name)}"]`;
   }
-  if (schema.type === "Object") {
+  if(isRoot || schema.type === "Object" || schema.type === "Document") {
+      query += "{\n";
+  }
+  if (!isDefaultSanityType(schema.type)) {
+    query += "{\n";
+    for (const field of getFields(schema.type, getTypeObjOfString)) {
+      query += `${sanitizeName(field.name)}${exportQuery(field, false, getTypeObjOfString)}, \n`;
+    }
+    query += "}\n";
+  }
+  if (schema.type === "Object" || schema.type === "Document") {
     const objectSchema = schema as SanityObjectFieldProperties;
     for (const field of objectSchema.fields) {
-      query += `${field.name},`;
-      if (field.type === "Object") {
-        query += exportQuery(field, false);
+      query += `${sanitizeName(field.name)}`;
+      if (field.type === "Object" || field.type === "Document" || field.type === "Array" || !isDefaultSanityType(field.type)) {
+        query += exportQuery(field, false, getTypeObjOfString);
       }
+      query += ",";
     }
   } else if (schema.type === "Reference") {
     const referenceSchema = schema as SanityReferenceFieldProperties;
@@ -138,13 +167,26 @@ const exportQuery = (schema: SanityFieldProperties, isRoot = true): string => {
     }
   }   else if (schema.type === "Array") {
     const arraySchema = schema as SanityArrayFieldProperties;
-    for (const ofType of arraySchema.of) {
-      query += `${ofType},`;
-  }
-}
+    console.log("arraySchema", arraySchema);
+    query += "{\n";
 
-if (isRoot) {
-    query += "}";
+      for (const ofType of arraySchema.of) {
+        console.log("ofType", ofType);
+        if (!isDefaultSanityType(ofType) && getTypeObjOfString(ofType).name === DEFAULT_DATA.name) {
+          query += `_type == '${sanitizeName(ofType)}' => { // TODO: Add selection of fields for ${ofType} },`;
+        } else if (!isDefaultSanityType(ofType) && getTypeObjOfString(ofType).name !== DEFAULT_DATA.name) {
+          query += `_type == '${sanitizeName(ofType)}' => ${exportQuery(getTypeObjOfString(ofType), false, getTypeObjOfString)},`;
+        } else if (ofType === 'Object') {
+          query += `${exportQuery(getTypeObjOfString(ofType), false, getTypeObjOfString)},`;
+        } else {
+          query += `${ofType},`;
+        }
+
+      }
+      query += "\n}";
+}
+  if(isRoot || schema.type === "Object" || schema.type === "Document") {
+    query += "\n}";
   }
   return query;
 };
@@ -152,6 +194,7 @@ if (isRoot) {
 const exportBySlugQuery = (
   schemaWithSlug: SanityFieldProperties,
   isRoot = true,
+  getTypeObjOfString: (name: string) => SanityFieldProperties
 ): string => {
   let query = "";
   if (isRoot) {
@@ -166,10 +209,11 @@ const exportBySlugQuery = (
         query += `${field.name},`;
       }
       if (field.type === "Object") {
-        query += exportBySlugQuery(field, false);
+        query += exportBySlugQuery(field, false, getTypeObjOfString);
       }
     }
   } else {
+    //TODO: array support
     if (schemaWithSlug.name === "slug") {
       query += `"slug": slug.current,`;
     } else {
@@ -283,6 +327,7 @@ const exportTSInterface = (
 const exportSanitySchema = (
   schema: SanityFieldProperties,
   isRoot = true,
+  getTypeObjOfString: (ofType: string) => SanityFieldProperties,
 ): string => {
   const typeDefEnd = isRoot ? `});` : `}),\n`;
 
@@ -290,14 +335,14 @@ const exportSanitySchema = (
     ? `import { defineField, defineType } from 'sanity'\n\n export default `
     : "";
 
-  if (schema.type === "Object") {
-    const objectSchema = schema as SanityObjectFieldProperties;
+  if (schema.type === "Object" || schema.type === "Document") {
+    const objectSchema = schema as SanityObjectFieldProperties | SanityDocumentFieldProperties;
 
     outStr += getBaseTypeDef(schema, isRoot);
     outStr += "fields: [\n";
 
     objectSchema.fields.forEach((field) => {
-      outStr += exportSanitySchema(field, false);
+      outStr += exportSanitySchema(field, false, getTypeObjOfString);
     });
 
     outStr += `  ],\n`;
@@ -365,6 +410,8 @@ const exportSanitySchema = (
       outStr += "\n\n";
       outStr += `export const ${schemaName.toUpperCase()}_BY_SLUG_QUERY = groq\`\n${exportBySlugQuery(
         schema,
+          true,
+          getTypeObjOfString
       )}\n\`\n`;
       outStr += `export const get${schemaName.replaceAll(
         "_",
@@ -372,13 +419,15 @@ const exportSanitySchema = (
       )}BySlug = (slug: string) => client.fetch(${schemaName.toUpperCase()}_BY_SLUG_QUERY, { slug })\n`;
     }
     outStr += "\n\n";
-    outStr += `export const ${schemaName.toUpperCase()}_QUERY = groq\`\n${exportQuery(
+    outStr += `export const ALL_${schemaName.toUpperCase()}_QUERY = groq\`\n${exportQuery(
       schema,
+        true,
+        getTypeObjOfString
     )}\n\`\n`;
-    outStr += `export const get${schemaName.replaceAll(
+    outStr += `export const getAll${schemaName.replaceAll(
       "_",
       "",
-    )} = () => client.fetch(${schemaName.toUpperCase()}_QUERY)\n`;
+    )} = () => client.fetch(ALL_${schemaName.toUpperCase()}_QUERY)\n`;
 
     outStr += "\n\n";
     outStr += exportTSInterface(schema);
@@ -765,8 +814,8 @@ const FieldForm: React.FC<FormFieldProps> = ({
   );
 };
 
-const saveTs = (fp: SanityFieldProperties) => {
-  const ts = CODEGEN_MESSAGE + exportSanitySchema(fp, true);
+const saveTs = (fp: SanityFieldProperties, getTypeObjOfString: (name: string) => SanityFieldProperties) => {
+  const ts = CODEGEN_MESSAGE + exportSanitySchema(fp, true, getTypeObjOfString);
 
   const blob2 = new Blob([ts], { type: "text/plain" });
   const url2 = URL.createObjectURL(blob2);
@@ -779,13 +828,13 @@ const saveTs = (fp: SanityFieldProperties) => {
   URL.revokeObjectURL(url2);
 };
 
-const saveTses = (fp: SanityFieldProperties[]) => {
+const saveTses = (fp: SanityFieldProperties[], getTypeObjOfString: (name: string) => SanityFieldProperties) => {
   const tses = fp
     .map(
       (f) =>
         CODEGEN_MESSAGE +
         `\n\n// ------------------ ${f.title} ------------------  \n\n` +
-        exportSanitySchema(f, true),
+        exportSanitySchema(f, true, getTypeObjOfString),
     )
     .join("");
 
@@ -856,21 +905,28 @@ const LeftRight = styled.div`
 
 interface customTypeContextType {
   customTypes: string[];
-  setCustomTypes: (customTypes: string[]) => void;
+  setCustomTypes: (customTypes: SanityFieldProperties[]) => void;
+  getTypeObjOfString: (name: string) => SanityFieldProperties,
 }
 
 export const CustomTypeContext = createContext<customTypeContextType>({
   customTypes: [],
   setCustomTypes: () => {},
+  getTypeObjOfString: () => DEFAULT_DATA,
 });
 
 export const CustomTypeProvider: React.FC<React.PropsWithChildren<{}>> = ({
   children,
 }) => {
-  const [customTypes, setCustomTypes] = useState<string[]>([]);
+  const [customTypeObjs, setCustomTypes] = useState<SanityFieldProperties[]>([]);
+  const getTypeObjOfString = (name: string) => {
+    return customTypeObjs.find((ct) => sanitizeName(ct.name) === name || ct.name === name) || DEFAULT_DATA;
+  }
+
+  const customTypes = customTypeObjs.map((ct) => sanitizeName(ct.name));
 
   return (
-    <CustomTypeContext.Provider value={{ customTypes, setCustomTypes }}>
+    <CustomTypeContext.Provider value={{ customTypes, setCustomTypes, getTypeObjOfString }}>
       {children}
     </CustomTypeContext.Provider>
   );
@@ -878,10 +934,10 @@ export const CustomTypeProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 const SanityTypeCreatorRaw = () => {
   const [datas, setDatas] = useState<SanityFieldProperties[]>([DEFAULT_DATA]);
-  const { setCustomTypes } = useContext(CustomTypeContext);
+  const { setCustomTypes, getTypeObjOfString } = useContext(CustomTypeContext);
 
   useEffect(() => {
-    setCustomTypes(datas.map((d) => d.name));
+    setCustomTypes(datas);
   }, [datas, setCustomTypes]);
 
   return (
@@ -917,7 +973,7 @@ const SanityTypeCreatorRaw = () => {
               <Button
                 variant={"outlined"}
                 onClick={() => {
-                  saveTs(data);
+                  saveTs(data, getTypeObjOfString);
                 }}
               >
                 Download Code (.ts)
@@ -944,7 +1000,7 @@ const SanityTypeCreatorRaw = () => {
           icon={<FaJs />}
           tooltipTitle={"Save All Generated Code (.ts)"}
           onClick={() => {
-            saveTses(datas);
+            saveTses(datas, getTypeObjOfString);
           }}
         />
 
