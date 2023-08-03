@@ -375,9 +375,9 @@ const getTSTypeName = (type: SanityFieldType | string, arrayType?: string[]): st
     case "Object":
       return "Object";
     case "Reference":
-      return "Reference /* TODO: fix reference type */";
+      return "any /* TODO: fix reference type */";
     case "Slug":
-      return "Slug";
+      return "string";
     case "String":
       return "string";
     case "Text":
@@ -785,7 +785,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
           defaultValue={false}
           render={({ field }) => (
             <FormControlLabel
-              control={<Checkbox {...field} checked={field.value} />}
+              control={<Checkbox {...field} checked={field.value as boolean} />}
               label="Hidden"
             />
           )}
@@ -797,7 +797,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
           defaultValue={false}
           render={({ field }) => (
             <FormControlLabel
-              control={<Checkbox {...field} checked={field.value}  />}
+              control={<Checkbox {...field} checked={field.value as boolean}  />}
               label="Read Only"
             />
 
@@ -814,7 +814,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value}  />}
+                  control={<Checkbox {...field} checked={field.value as boolean}  />}
                   label="Use Pre-defined Strings (enum)"
                 />
               )}
@@ -843,7 +843,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value}  />}
+                  control={<Checkbox {...field} checked={field.value as boolean}  />}
                   label="Hotspot"
                 />
               )}
@@ -876,7 +876,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value}  />}
+                  control={<Checkbox {...field} checked={field.value as boolean}  />}
                   label="Caption"
                 />
               )}
@@ -889,7 +889,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value}  />}
+                  control={<Checkbox {...field} checked={field.value as boolean}  />}
                   label="Alt"
                 />
               )}
@@ -924,7 +924,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value}  />}
+                  control={<Checkbox {...field} checked={field.value as boolean}  />}
                   label="Weak"
                 />
               )}
@@ -959,7 +959,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
               defaultValue={false}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value}  />}
+                  control={<Checkbox {...field} checked={field.value as boolean}  />}
                   label="Sortable"
                 />
               )}
