@@ -2,7 +2,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  pointer-events: none;
+  /* pointer-events: none; */
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -27,5 +27,5 @@ a {
 }
 
 #__next {
-  pointer-events: none;
+  /* pointer-events: none; */
 }

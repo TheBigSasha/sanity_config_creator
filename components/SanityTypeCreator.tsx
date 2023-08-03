@@ -1019,7 +1019,6 @@ const ResponsiveGrid = styled.div`
   max-width: 100%;
   overflow: auto;
   min-height: calc(100vh - 12rem);
-  pointer-events: none;
 `;
 
 const DEFAULT_DATA: SanityDocumentFieldProperties = {

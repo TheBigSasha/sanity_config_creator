@@ -10,11 +10,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
-}
-
-.main * {
-  pointer-events: auto;
 }
 
 .footer {
