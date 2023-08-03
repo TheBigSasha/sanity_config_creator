@@ -10,7 +10,8 @@ import {
   Tooltip,
   MenuItem,
   Paper,
-  Typography, SpeedDial, SpeedDialIcon, SpeedDialAction, Accordion,
+  AlertTitle,
+  Typography, SpeedDial, SpeedDialIcon, SpeedDialAction, Accordion, Alert
 } from "@mui/material";
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -420,9 +421,13 @@ const FieldForm: React.FC<FormFieldProps> = ({
       : [];
   const allObjectNames = [...SanityFieldTypes, newlyCreatedObjectNames].flat();
 
+  const validTypes = isRoot ? ["Document", "Object"] : SanityFieldTypes;
+
   // @ts-ignore
   const out = <>
       <Form isRoot={isRoot} onSubmit={handleSubmit(onSubmit)}>
+        {(isRoot && type === "Object") && <> <Alert severity="info">   <AlertTitle>Top Level Object Type</AlertTitle>
+          By default, object types can not be represented as standalone documents in the data store. If you want to define an object type that you'd like to be represented as a document with an id, revision and created and updated timestamps, you should define it using the document type instead. Apart from these additional fields, there's no semantic difference between a document and an object. <a href={"https://www.sanity.io/docs/object-type"}> Learn more</a></Alert>  <br/> </>}
         <Controller
           name="name"
           control={control}
@@ -444,7 +449,7 @@ const FieldForm: React.FC<FormFieldProps> = ({
                   field.onChange(e);
                 }}
               >
-                {SanityFieldTypes.map((type) => (
+                {validTypes.map((type) => (
                   <MenuItem key={type} value={type}>
                     {type}
                   </MenuItem>
