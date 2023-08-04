@@ -306,7 +306,7 @@ const exportBySlugQuery = (
       if (field.name === "slug") {
         query += `"slug": slug.current,`;
       } else {
-        query += `${field.name},`;
+        query += `${sanitizeName(field.name)},`;
       }
       if (field.type === "Object") {
         query += exportBySlugQuery(field, false, getTypeObjOfString);
@@ -735,8 +735,20 @@ const FieldForm: React.FC<FormFieldProps> = ({
         <Controller
           name="name"
           control={control}
+          rules={{ required: true, pattern: /^[a-zA-Z0-9_]+$/ }}
           defaultValue=""
-          render={({ field }) => <TextField {...field} label="Field Name (record key)" />}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              label="Field name (Record key)"
+              error={fieldState.invalid}
+              helperText={
+                fieldState.invalid
+                  ? "Name must be alphanumeric and contain no spaces"
+                  : ""
+              }
+            />
+          )}
         />
         <br />
         <Controller
