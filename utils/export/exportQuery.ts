@@ -1,4 +1,4 @@
-import { SanityArrayFieldProperties, SanityFieldProperties, SanityObjectFieldProperties, SanityReferenceFieldProperties } from "../../types/SanityFieldProperties";
+import { DEFAULT_DATA, SanityArrayFieldProperties, SanityFieldProperties, SanityObjectFieldProperties, SanityReferenceFieldProperties } from "../../types/SanityFieldProperties";
 import { hasFields, getFields } from "../getFields";
 import { isDefaultSanityType } from "../isDefaultSanityType";
 import { needsRecursiveExport } from "../needsRecursiveExport";

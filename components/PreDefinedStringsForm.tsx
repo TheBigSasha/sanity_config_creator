@@ -2,6 +2,7 @@ import { Button, TextField } from "@mui/material";
 import { useFieldArray, Controller } from "react-hook-form";
 import { FaPlus } from "react-icons/fa";
 import { VscTrash } from "react-icons/vsc";
+import { Horizontal } from "./Horizontal";
 
 export const PreDefinedStringsForm: React.FC<{control: any}> = ({control}) => {
     // form to edit list of predefined strings
