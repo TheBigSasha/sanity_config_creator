@@ -1308,7 +1308,8 @@ const SanityTypeCreatorRaw = () => {
             }
         />
 
-<SpeedDialAction
+          {/* TODO: add preset gallery modal UI */}
+        <SpeedDialAction
           icon={<VscBook />}
           tooltipTitle={"Load from Preset"}
           onClick={() => {
