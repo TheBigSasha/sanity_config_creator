@@ -1,0 +1,90 @@
+[
+  {
+    "type": "Document",
+    "name": "Hero",
+    "title": "Hero Banner",
+    "description": "A banner to showcase something -- what to show off is up to you!",
+    "fields": [
+      {
+        "name": "Headline",
+        "title": "Headline",
+        "type": "String",
+        "description": "The most prominent text of the hero.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "Body",
+        "title": "Body",
+        "type": "Array",
+        "description": "The body of the hero, placed below the headline with subtitle / caption level prominence.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": [],
+        "of": [
+          "Block"
+        ],
+        "options": {
+          "sortable": false,
+          "layout": "list"
+        }
+      },
+      {
+        "name": "Banner",
+        "title": "Banner",
+        "type": "Image",
+        "description": "The image which is behind the text, filling the hero view.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false,
+          "caption": true,
+          "alt": true
+        },
+        "fields": [],
+        "options": {
+          "hotspot": false,
+          "accept": "",
+          "sources": ""
+        }
+      },
+      {
+        "name": "Layout",
+        "title": "Layout",
+        "type": "String",
+        "description": "How the banner is laid out.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": true
+        },
+        "fields": [],
+        "options": {
+          "list": [
+            {
+              "title": "Left",
+              "value": "left"
+            },
+            {
+              "title": "Right",
+              "value": "right"
+            },
+            {
+              "title": "Center",
+              "value": "center"
+            }
+          ]
+        }
+      }
+    ],
+    "readOnly": false,
+    "hidden": false
+  }
+]

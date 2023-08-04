@@ -47,6 +47,7 @@ import {
   VscSaveAll,
   VscNewFile,
   VscTrash,
+  VscBook,
 } from "react-icons/vsc";
 import {
   BsCalendarDate,
@@ -57,6 +58,7 @@ import {
 import styles from "../styles/Home.module.css";
 import { CODEGEN_MESSAGE } from "../constants/CodegenMessage";
 import { UnchoosableTypes } from "../constants/UnchoosableTypes";
+import { getHeroBannerPreset } from "../presets/GetPreset";
 
 type SanityFieldType =
   | "Array"
@@ -1304,6 +1306,14 @@ const SanityTypeCreatorRaw = () => {
                 input.click();
             }
             }
+        />
+
+<SpeedDialAction
+          icon={<VscBook />}
+          tooltipTitle={"Load from Preset"}
+          onClick={() => {
+            setDatas(getHeroBannerPreset())
+          }}
         />
       </SpeedDial>
     </>
