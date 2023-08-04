@@ -391,6 +391,8 @@ const getTSTypeName = (type: SanityFieldType | string, arrayType?: string[]): st
       return "string";
     case "Text":
       return "String";
+    case "URL":
+      return "URL";
     default:
       return isDefaultSanityType(type) ? type.toLowerCase() : sanitizeName(type);
   }
