@@ -1,6 +1,7 @@
 import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button } from "@mui/material";
 import { useState } from "react";
 import { SanityFieldProperties } from "../types/SanityFieldProperties";
+import { VscInfo } from "react-icons/vsc";
 
 interface GitHubIntegrationProps {
     onDismiss: () => void;
@@ -27,25 +28,13 @@ export const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
 
     return (
         <Dialog open={true} onClose={onDismiss}>
-            <DialogTitle>GitHub Integration</DialogTitle>
+            <DialogTitle>GitHub Integration <Button onClick={() => {
+                window.open("https://github.com/TheBigSasha/sanity_config_creator/blob/main/gh_integration.md", "_blank");
+            }} variant={"text"}><VscInfo/></Button></DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     Enter the GitHub repository URL to get started.
                 </DialogContentText>
-                <TextField
-                    label="Repository URL"
-                    value={genrateGitHubURL(username || "", reponame || "", branch || "")}
-                    onChange={(e) => {
-                        const url = new URL(e.target.value);
-                        const path = url.pathname.split("/");
-                        if (path.length >= 3) {
-                            setUsername(path[1]);
-                            setReponame(path[2]);
-                            setBranch(path[4] || "main");
-                        }
-                    }}
-                />
-                <br />
                 <TextField
                     label="Username"
                     value={username}
@@ -95,7 +84,7 @@ export const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
                             });
                         }
                     }}
-                    disabled={loading}
+                    disabled={loading || !username || !reponame || !branch}
                 >
                     {loading ? "Loading..." : "Load"}
                 </Button>

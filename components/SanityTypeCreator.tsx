@@ -15,6 +15,7 @@ import {
   VscBook,
   VscCopy,
   VscDesktopDownload,
+  VscGithub,
 } from "react-icons/vsc";
 import {
   BsFiletypeJson,
@@ -29,6 +30,7 @@ import { FieldForm } from "./FieldForm";
 import { LeftRight } from "./LeftRight";
 import { ResponsiveGrid } from "./ResponsiveGrid";
 import { PresetGallery } from "./PresetGallery";
+import { GitHubIntegration } from "./GitHubIntegration";
 
 
 const SanityTypeCreatorRaw = () => {
@@ -50,6 +52,7 @@ const SanityTypeCreatorRaw = () => {
   };
 
   const [presetGalleryOpen, setPresetGalleryOpen] = useState(false);
+  const [githubIntegrationOpen, setGitHubIntegrationOpen] = useState(false);
 
 
   return (
@@ -188,12 +191,19 @@ const SanityTypeCreatorRaw = () => {
             }
         />
 
-          {/* TODO: add preset gallery modal UI */}
         <SpeedDialAction
           icon={<VscBook />}
           tooltipTitle={"Load from Preset"}
           onClick={() => {
             setPresetGalleryOpen(true);
+          }}
+        />
+
+        <SpeedDialAction
+          icon={<VscGithub />}
+          tooltipTitle={"Import Schema from GitHub"}
+          onClick={() => {
+            setGitHubIntegrationOpen(true);
           }}
         />
       </SpeedDial>
@@ -213,6 +223,12 @@ const SanityTypeCreatorRaw = () => {
           setCopiedNotif(`Replaced editor content with preset schema ${preset.title}`);
         }
         } onDismiss={() => setPresetGalleryOpen(false)} presets={getAllPresets()} />
+        }
+        {
+          githubIntegrationOpen &&
+          <GitHubIntegration onDismiss={() => setGitHubIntegrationOpen(false)} onGotJSON={(json) => {
+            setDatas(json);
+          }} />
         }
     </>
   );
