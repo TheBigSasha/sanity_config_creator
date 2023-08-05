@@ -1,0 +1,24 @@
+[
+    {
+      "type": "Document",
+      "name": "GitHubDemo",
+      "title": "GitHub Integration Demo",
+      "description": "A schema meant to demonstrate how we use the GitHub integration on this app.",
+      "fields": [
+        {
+          "name": "FooBar",
+          "title": "Foo Bar",
+          "type": "String",
+          "description": "A misc field.",
+          "hidden": false,
+          "readOnly": false,
+          "internalConfig": {
+            "predefined": false
+          },
+          "fields": []
+        }
+      ],
+      "readOnly": false,
+      "hidden": false
+    }
+  ]

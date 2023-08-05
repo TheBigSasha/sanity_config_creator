@@ -37,7 +37,9 @@ export const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
                 </DialogContentText>
                 <TextField
                     label="Username"
+                    fullWidth={true}
                     value={username}
+                    helperText={"The username of the owner of the repository IE TheBigSasha"}
                     onChange={(e) => {
                         setUsername(e.target.value);
                     }}
@@ -46,6 +48,8 @@ export const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
                 <TextField
                     label="Repository Name"
                     value={reponame}
+                    fullWidth={true}
+                    helperText={"The name of the repository IE sanity_config_creator"}
                     onChange={(e) => {
                         setReponame(e.target.value);
                     }}
@@ -53,7 +57,9 @@ export const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
                 <br />
                 <TextField
                     label="Branch"
+                    fullWidth={true}
                     value={branch}
+                    helperText={"The branch to fetch the schema from IE main"}
                     onChange={(e) => {
                         setBranch(e.target.value);
                     }}
