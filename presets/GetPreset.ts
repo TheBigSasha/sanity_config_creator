@@ -12,6 +12,7 @@ const ALL_PRESET_LIST: GalleryPreset[] = [
         subtitle: "An extensible gallery for a photographer",
         element: require("./Photo_Post-Photo_Album-Home_Page.json"),
     }
+    // TODO: add sanity default nextjs blog schema preset when all features are implemented
 ]
 
 
