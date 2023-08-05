@@ -1,13 +1,21 @@
-import { SanityFieldProperties } from "../types/SanityFieldProperties";
+import { GalleryPreset } from "../types/GalleryPreset";
 
-// parses and returns ./hero-banner.json
-export const getHeroBannerPreset = () => {
-    const heroBanner = require('./Hero_Banner.json')
-    return heroBanner;
-}
 
-interface GalleryPreset {
-    name: string;
-    caption: string;
-    content: SanityFieldProperties[];
+const ALL_PRESET_LIST: GalleryPreset[] = [
+    {
+        title: 'Hero Banner',
+        subtitle: "A large banner with a title and subtitle",
+        element: require("./Hero_Banner.json"),
+    },
+    {
+        title: 'Photo Gallery',
+        subtitle: "An extensible gallery for a photographer",
+        element: require("./Photo_Post-Photo_Album-Home_Page.json"),
+    }
+]
+
+
+
+export const getAllPresets: () => GalleryPreset[] = () => {
+    return ALL_PRESET_LIST;
 }

@@ -1,0 +1,251 @@
+[
+  {
+    "type": "Document",
+    "name": "PhotoPost",
+    "title": "Photo Post",
+    "description": "A post for the photo gallery.",
+    "fields": [
+      {
+        "name": "Image",
+        "title": "Image",
+        "type": "Image",
+        "description": "The photo that's posted.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false,
+          "caption": true,
+          "alt": true
+        },
+        "fields": [],
+        "options": {
+          "hotspot": true,
+          "accept": "",
+          "sources": ""
+        }
+      },
+      {
+        "name": "slug",
+        "title": "slug",
+        "type": "Slug",
+        "description": "The URL extension the post can be found at.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "Background",
+        "title": "Background",
+        "type": "String",
+        "description": "The way we should render the page surrounding the image.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": true
+        },
+        "fields": [],
+        "options": {
+          "list": [
+            {
+              "title": "Dark",
+              "value": "dark"
+            },
+            {
+              "title": "Light",
+              "value": "light"
+            },
+            {
+              "title": "System",
+              "value": "system"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Date",
+        "title": "Date",
+        "type": "Datetime",
+        "description": "When the photo was posted or taken or such.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "Location",
+        "title": "Location",
+        "type": "Geopoint",
+        "description": "Where the photo was taken.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "Rating",
+        "title": "Rating",
+        "type": "Number",
+        "description": "The rating of the photo (how good it is and how prominently it should feature when sorting).",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "Tags",
+        "title": "Tags",
+        "type": "Array",
+        "description": "Tags allowing this photo to be found in search.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": [],
+        "of": [
+          "String"
+        ],
+        "options": {
+          "sortable": true,
+          "layout": "tags"
+        }
+      }
+    ],
+    "readOnly": false,
+    "hidden": false
+  },
+  {
+    "type": "Document",
+    "name": "PhotoAlbum",
+    "title": "Photo Album",
+    "description": "An album showcasing a set of photos.",
+    "fields": [
+      {
+        "name": "Gallery",
+        "title": "Gallery",
+        "type": "Array",
+        "description": "The photos in this album",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": [],
+        "of": [
+          "PhotoPost"
+        ],
+        "options": {
+          "sortable": true,
+          "layout": "grid"
+        }
+      },
+      {
+        "name": "Title",
+        "title": "Title",
+        "type": "String",
+        "description": "The title of the album",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "StartDate",
+        "title": "Start Date",
+        "type": "Datetime",
+        "description": "When the album's contents started.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "EndDate",
+        "title": "End Date",
+        "type": "Datetime",
+        "description": "When the album's contents end.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "BlogPost",
+        "title": "Blog Post",
+        "type": "Array",
+        "description": "A long form blog about the photo album.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": [],
+        "of": [
+          "Block"
+        ],
+        "options": {
+          "sortable": false,
+          "layout": "grid"
+        }
+      }
+    ],
+    "readOnly": false,
+    "hidden": false
+  },
+  {
+    "type": "Document",
+    "name": "HomePage",
+    "title": "Home Page",
+    "description": "The landing page of the site.",
+    "fields": [
+      {
+        "name": "Headline",
+        "title": "Headline",
+        "type": "String",
+        "description": "The main title of the site.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": []
+      },
+      {
+        "name": "Featured",
+        "title": "Featured Albums",
+        "type": "Array",
+        "description": "The albums which we want to direct users to.",
+        "hidden": false,
+        "readOnly": false,
+        "internalConfig": {
+          "predefined": false
+        },
+        "fields": [],
+        "of": [
+          "PhotoAlbum"
+        ],
+        "options": {
+          "sortable": true,
+          "layout": "list"
+        }
+      }
+    ],
+    "readOnly": false,
+    "hidden": false
+  }
+]

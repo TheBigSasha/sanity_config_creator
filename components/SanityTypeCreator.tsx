@@ -20,7 +20,7 @@ import {
   BsFiletypeJson,
   BsUpload
 } from "react-icons/bs";
-import { getHeroBannerPreset } from "../presets/GetPreset";
+import { getAllPresets } from "../presets/GetPreset";
 import { SanityFieldProperties, DEFAULT_DATA } from "../types/SanityFieldProperties";
 import { CustomTypeContext, CustomTypeProvider } from "../utils/context/customTypeContext";
 import { saveJsons } from "../utils/export/saveJSON";
@@ -28,6 +28,7 @@ import { copyQueryToClipboard, copySchemaToClipboard, copyTsInterfaceToClipboard
 import { FieldForm } from "./FieldForm";
 import { LeftRight } from "./LeftRight";
 import { ResponsiveGrid } from "./ResponsiveGrid";
+import { PresetGallery } from "./PresetGallery";
 
 
 const SanityTypeCreatorRaw = () => {
@@ -48,9 +49,7 @@ const SanityTypeCreatorRaw = () => {
     setCopiedNotif(undefined);
   };
 
-  const handleOpen = (message: string) => {
-    setCopiedNotif(message);
-  };
+  const [presetGalleryOpen, setPresetGalleryOpen] = useState(false);
 
 
   return (
@@ -194,7 +193,7 @@ const SanityTypeCreatorRaw = () => {
           icon={<VscBook />}
           tooltipTitle={"Load from Preset"}
           onClick={() => {
-            setDatas(getHeroBannerPreset())
+            setPresetGalleryOpen(true);
           }}
         />
       </SpeedDial>
@@ -207,6 +206,14 @@ const SanityTypeCreatorRaw = () => {
           {copiedNotif}
         </Alert>
         </Snackbar>
+        {presetGalleryOpen &&
+        <PresetGallery onChoosePreset={(preset) => {
+          setDatas(preset.element);
+          setPresetGalleryOpen(false);
+          setCopiedNotif(`Replaced editor content with preset schema ${preset.title}`);
+        }
+        } onDismiss={() => setPresetGalleryOpen(false)} presets={getAllPresets()} />
+        }
     </>
   );
 };
