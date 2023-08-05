@@ -1,7 +1,8 @@
-import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button, Alert } from "@mui/material";
 import { useState } from "react";
 import { SanityFieldProperties } from "../types/SanityFieldProperties";
 import { VscInfo } from "react-icons/vsc";
+import { get } from "https";
 
 interface GitHubIntegrationProps {
     onDismiss: () => void;
@@ -67,7 +68,8 @@ export const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
                 <br />
                 {error && (
                     <DialogContentText>
-                        {error}
+                        <Alert severity="error">{error}
+                            </Alert>
                     </DialogContentText>
                 )}
             </DialogContent>
@@ -78,16 +80,22 @@ export const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
                         if (username && reponame && branch) {
                             setLoading(true);
                             fetch(genrateGitHubURL(username, reponame, branch)).then((res) => {
-                                if (res.ok) {
+                                if (res.status === 200) {
                                     res.json().then((json) => {
                                         onGotJSON(json);
                                         onDismiss();
                                     });
                                 } else {
-                                    setError("Error fetching schema");
+                                    setError(`Error ${res.status}: ${res.statusText}`);
                                 }
+                            }
+                            ).catch((e) => {
+                                setError(e.toString());
+                            }
+                            ).finally(() => {
                                 setLoading(false);
-                            });
+                            }
+                            );
                         }
                     }}
                     disabled={loading || !username || !reponame || !branch}
