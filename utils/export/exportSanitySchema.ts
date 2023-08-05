@@ -77,7 +77,7 @@ export const generateSanitySchema = (
       outStr += `        to: [`;
       referenceSchema.to.forEach((ref, index) => {
         if (index > 0) outStr += `, `;
-        outStr += `{type: '${ref.toLowerCase()}'}`;
+        outStr += `{type: '${ref}'}`;
       });
   
       outStr += `],\n`;
