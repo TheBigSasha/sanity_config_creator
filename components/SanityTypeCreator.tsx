@@ -111,7 +111,7 @@ const SanityTypeCreatorRaw = () => {
                 </Button>
                 <Button variant={"outlined"} onClick={
                   () => {
-                    copyTsInterfaceToClipboard(data, getTypeObjOfString);
+                    copyTsInterfaceToClipboard(data);
                     setCopiedNotif(`Copied TypeScript interface for types in ${data.title} to Clipboard`);
                   }
                 }
