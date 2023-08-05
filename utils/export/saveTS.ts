@@ -1,7 +1,7 @@
 import { CODEGEN_MESSAGE, MINI_CODEGEN_MESSAGE } from "../../constants/CodegenMessage";
 import { SanityFieldProperties } from "../../types/SanityFieldProperties";
 import { sanitizeName } from "../sanitizeName";
-import { exportSanitySchema, generateSanitySchema } from "./exportSanitySchema";
+import { exportSanitySchema, generateSanityQueries, generateSanitySchema } from "./exportSanitySchema";
 import { exportTSInterface } from "./exportTsInterface";
 
 export const saveTs = (fp: SanityFieldProperties, getTypeObjOfString: (name: string) => SanityFieldProperties) => {
@@ -45,7 +45,7 @@ export const saveTs = (fp: SanityFieldProperties, getTypeObjOfString: (name: str
   }
 
   export const copyQueryToClipboard =  (fp: SanityFieldProperties, getTypeObjOfString: (name: string) => SanityFieldProperties) => {
-    const ts = MINI_CODEGEN_MESSAGE + generateSanitySchema(fp, true, getTypeObjOfString);
+    const ts = MINI_CODEGEN_MESSAGE + generateSanityQueries(fp, true, getTypeObjOfString);
     navigator.clipboard.writeText(ts);
   }
 
