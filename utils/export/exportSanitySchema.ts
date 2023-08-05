@@ -6,12 +6,12 @@ import { exportBySlugQuery, exportQuery } from "./exportQuery";
 import { exportTSInterface } from "./exportTsInterface";
 import { getBaseTypeDef } from "./getBaseTypeDef";
 
-export const exportSanitySchema = (
+export const generateSanitySchema = (
     schema: SanityFieldProperties,
     isRoot = true,
     getTypeObjOfString: (ofType: string) => SanityFieldProperties,
-  ): string => {
-    const typeDefEnd = isRoot ? `});` : `}),\n`;
+    ): string => {
+        const typeDefEnd = isRoot ? `});` : `}),\n`;
   
     let outStr = isRoot
       ? `import { defineField, defineType } from 'sanity'\n\n export default `
@@ -123,9 +123,16 @@ export const exportSanitySchema = (
       outStr += getBaseTypeDef(schema, isRoot);
       outStr += typeDefEnd;
     }
-  
-    if (isRoot) {
-      //TODO: - Rich text and other types query generation improvements
+    return outStr;
+    };
+
+    export const generateSanityQueries = (
+        schema: SanityFieldProperties,
+        isRoot = true,
+        getTypeObjOfString: (ofType: string) => SanityFieldProperties,
+        ): string => {
+            let outStr = "";
+             //TODO: - Rich text and other types query generation improvements
       const schemaName = sanitizeName(schema.name);
       if (hasSlug(schema)) {
         outStr += "\n\n";
@@ -149,6 +156,20 @@ export const exportSanitySchema = (
         "_",
         "",
       )} = () => client.fetch(ALL_${schemaName.toUpperCase()}_QUERY)\n`;
+        return outStr;
+    };
+
+
+export const exportSanitySchema = (
+    schema: SanityFieldProperties,
+    isRoot = true,
+    getTypeObjOfString: (ofType: string) => SanityFieldProperties,
+  ): string => {
+    let outStr = generateSanitySchema(schema, isRoot, getTypeObjOfString);
+  
+    if (isRoot) {
+     outStr += "\n\n";
+      outStr += generateSanityQueries(schema, isRoot, getTypeObjOfString);
   
       outStr += "\n\n";
       outStr += exportTSInterface(schema);

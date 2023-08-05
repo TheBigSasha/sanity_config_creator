@@ -5,11 +5,16 @@ import {
   SpeedDial,
   SpeedDialIcon,
   SpeedDialAction,
+  ButtonGroup,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   VscSaveAll,
   VscNewFile,
   VscBook,
+  VscCopy,
+  VscDesktopDownload,
 } from "react-icons/vsc";
 import {
   BsFiletypeJson,
@@ -19,7 +24,7 @@ import { getHeroBannerPreset } from "../presets/GetPreset";
 import { SanityFieldProperties, DEFAULT_DATA } from "../types/SanityFieldProperties";
 import { CustomTypeContext, CustomTypeProvider } from "../utils/context/customTypeContext";
 import { saveJsons } from "../utils/export/saveJSON";
-import { saveTs, saveTses } from "../utils/export/saveTS";
+import { copyQueryToClipboard, copySchemaToClipboard, copyTsInterfaceToClipboard, saveTs, saveTses } from "../utils/export/saveTS";
 import { FieldForm } from "./FieldForm";
 import { LeftRight } from "./LeftRight";
 import { ResponsiveGrid } from "./ResponsiveGrid";
@@ -32,6 +37,21 @@ const SanityTypeCreatorRaw = () => {
   useEffect(() => {
     setCustomTypes(datas);
   }, [datas, setCustomTypes]);
+
+  const [copiedNotif, setCopiedNotif] = useState<string | undefined>(undefined);
+
+  const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setCopiedNotif(undefined);
+  };
+
+  const handleOpen = (message: string) => {
+    setCopiedNotif(message);
+  };
+
 
   return (
     <>
@@ -63,14 +83,44 @@ const SanityTypeCreatorRaw = () => {
             }}
             defaultValues={data}
             extraButtons={
-              <Button
-                variant={"outlined"}
-                onClick={() => {
-                  saveTs(data, getTypeObjOfString);
-                }}
-              >
-                Download Code (.ts)
-              </Button>
+              <ButtonGroup>
+                <Button
+                  variant={"outlined"}
+                  onClick={() => {
+                    saveTs(data, getTypeObjOfString);
+                    setCopiedNotif(`Saved all TypeScript code for ${data.title} to Downloads`);
+                  }}
+                >
+                  <VscDesktopDownload/> All (.ts)
+                </Button>
+                <Button
+                  variant={"outlined"}
+                  onClick={() => {copySchemaToClipboard(data, getTypeObjOfString); setCopiedNotif(`Copied Sanity Schema for ${data.title} to Clipboard`);
+                }
+                  }
+                >
+                  <VscCopy/> Schema
+                </Button>
+                <Button
+                  variant={"outlined"}
+                  onClick={() => {
+                    copyQueryToClipboard(data, getTypeObjOfString);
+                    setCopiedNotif(`Copied GROQ Query for ${data.title} to Clipboard`);
+                  }}
+                >
+                   <VscCopy/> Query
+                </Button>
+                <Button variant={"outlined"} onClick={
+                  () => {
+                    copyTsInterfaceToClipboard(data, getTypeObjOfString);
+                    setCopiedNotif(`Copied TypeScript interface for types in ${data.title} to Clipboard`);
+                  }
+                }
+                >
+                  <VscCopy/> TS Types
+                </Button>
+              </ButtonGroup>
+            
             }
           />
         ))}
@@ -148,6 +198,15 @@ const SanityTypeCreatorRaw = () => {
           }}
         />
       </SpeedDial>
+      <Snackbar
+          open={copiedNotif !== undefined}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert severity="success">
+          {copiedNotif}
+        </Alert>
+        </Snackbar>
     </>
   );
 };
