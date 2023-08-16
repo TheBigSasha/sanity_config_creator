@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
-   Typography,
+  Typography,
   SpeedDial,
   SpeedDialIcon,
   SpeedDialAction,
@@ -17,21 +17,29 @@ import {
   VscDesktopDownload,
   VscGithub,
 } from "react-icons/vsc";
-import {
-  BsFiletypeJson,
-  BsUpload
-} from "react-icons/bs";
+import { BsFiletypeJson, BsUpload } from "react-icons/bs";
 import { getAllPresets } from "../presets/GetPreset";
-import { SanityFieldProperties, DEFAULT_DATA } from "../types/SanityFieldProperties";
-import { CustomTypeContext, CustomTypeProvider } from "../utils/context/customTypeContext";
+import {
+  SanityFieldProperties,
+  DEFAULT_DATA,
+} from "../types/SanityFieldProperties";
+import {
+  CustomTypeContext,
+  CustomTypeProvider,
+} from "../utils/context/customTypeContext";
 import { saveJsons } from "../utils/export/saveJSON";
-import { copyQueryToClipboard, copySchemaToClipboard, copyTsInterfaceToClipboard, saveTs, saveTses } from "../utils/export/saveTS";
+import {
+  copyQueryToClipboard,
+  copySchemaToClipboard,
+  copyTsInterfaceToClipboard,
+  saveTs,
+  saveTses,
+} from "../utils/export/saveTS";
 import { FieldForm } from "./FieldForm";
 import { LeftRight } from "./LeftRight";
 import { ResponsiveGrid } from "./ResponsiveGrid";
 import { PresetGallery } from "./PresetGallery";
 import { GitHubIntegration } from "./GitHubIntegration";
-
 
 const SanityTypeCreatorRaw = () => {
   const [datas, setDatas] = useState<SanityFieldProperties[]>([DEFAULT_DATA]);
@@ -43,8 +51,11 @@ const SanityTypeCreatorRaw = () => {
 
   const [copiedNotif, setCopiedNotif] = useState<string | undefined>(undefined);
 
-  const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === "clickaway") {
       return;
     }
 
@@ -54,13 +65,12 @@ const SanityTypeCreatorRaw = () => {
   const [presetGalleryOpen, setPresetGalleryOpen] = useState(false);
   const [githubIntegrationOpen, setGitHubIntegrationOpen] = useState(false);
 
-
   return (
     <>
       <ResponsiveGrid>
         {datas.map((data, index) => (
           <FieldForm
-              key={data.title + index}
+            key={data.title + index}
             topBar={
               <LeftRight>
                 <Typography variant={"h6"}>
@@ -90,39 +100,47 @@ const SanityTypeCreatorRaw = () => {
                   variant={"outlined"}
                   onClick={() => {
                     saveTs(data, getTypeObjOfString);
-                    setCopiedNotif(`Saved all TypeScript code for ${data.title} to Downloads`);
+                    setCopiedNotif(
+                      `Saved all TypeScript code for ${data.title} to Downloads`,
+                    );
                   }}
                 >
-                  <VscDesktopDownload/> All (.ts)
+                  <VscDesktopDownload /> All (.ts)
                 </Button>
                 <Button
                   variant={"outlined"}
-                  onClick={() => {copySchemaToClipboard(data, getTypeObjOfString); setCopiedNotif(`Copied Sanity Schema for ${data.title} to Clipboard`);
-                }
-                  }
+                  onClick={() => {
+                    copySchemaToClipboard(data, getTypeObjOfString);
+                    setCopiedNotif(
+                      `Copied Sanity Schema for ${data.title} to Clipboard`,
+                    );
+                  }}
                 >
-                  <VscCopy/> Schema
+                  <VscCopy /> Schema
                 </Button>
                 <Button
                   variant={"outlined"}
                   onClick={() => {
                     copyQueryToClipboard(data, getTypeObjOfString);
-                    setCopiedNotif(`Copied GROQ Query for ${data.title} to Clipboard`);
+                    setCopiedNotif(
+                      `Copied GROQ Query for ${data.title} to Clipboard`,
+                    );
                   }}
                 >
-                   <VscCopy/> Query
+                  <VscCopy /> Query
                 </Button>
-                <Button variant={"outlined"} onClick={
-                  () => {
+                <Button
+                  variant={"outlined"}
+                  onClick={() => {
                     copyTsInterfaceToClipboard(data);
-                    setCopiedNotif(`Copied TypeScript interface for types in ${data.title} to Clipboard`);
-                  }
-                }
+                    setCopiedNotif(
+                      `Copied TypeScript interface for types in ${data.title} to Clipboard`,
+                    );
+                  }}
                 >
-                  <VscCopy/> TS Types
+                  <VscCopy /> TS Types
                 </Button>
               </ButtonGroup>
-            
             }
           />
         ))}
@@ -157,38 +175,36 @@ const SanityTypeCreatorRaw = () => {
           }}
         />
 
-
         <SpeedDialAction
-            icon={<BsUpload />}
-            tooltipTitle={"Import from JSON"}
-            onClick={() => {
-                const input = document.createElement("input");
-                input.type = "file";
-                input.accept = "application/json";
-                input.onchange = (e) => {
-                    const files = (e.target as HTMLInputElement).files;
-                    if (files && files.length > 0) {
-                        const file = files[0];
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const contents = e.target?.result;
-                            if (typeof contents === "string") {
-                                try {
-                                    const parsed = JSON.parse(contents);
-                                    if (Array.isArray(parsed)) {
-                                        setDatas(parsed);
-                                    }
-                                } catch (e) {
-                                    console.error(e);
-                                }
-                            }
-                        };
-                        reader.readAsText(file);
+          icon={<BsUpload />}
+          tooltipTitle={"Import from JSON"}
+          onClick={() => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "application/json";
+            input.onchange = (e) => {
+              const files = (e.target as HTMLInputElement).files;
+              if (files && files.length > 0) {
+                const file = files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  const contents = e.target?.result;
+                  if (typeof contents === "string") {
+                    try {
+                      const parsed = JSON.parse(contents);
+                      if (Array.isArray(parsed)) {
+                        setDatas(parsed);
+                      }
+                    } catch (e) {
+                      console.error(e);
                     }
+                  }
                 };
-                input.click();
-            }
-            }
+                reader.readAsText(file);
+              }
+            };
+            input.click();
+          }}
         />
 
         <SpeedDialAction
@@ -208,28 +224,33 @@ const SanityTypeCreatorRaw = () => {
         />
       </SpeedDial>
       <Snackbar
-          open={copiedNotif !== undefined}
+        open={copiedNotif !== undefined}
         autoHideDuration={6000}
         onClose={handleClose}
       >
-        <Alert severity="success">
-          {copiedNotif}
-        </Alert>
-        </Snackbar>
-        {presetGalleryOpen &&
-        <PresetGallery onChoosePreset={(preset) => {
-          setDatas(preset.element);
-          setPresetGalleryOpen(false);
-          setCopiedNotif(`Replaced editor content with preset schema ${preset.title}`);
-        }
-        } onDismiss={() => setPresetGalleryOpen(false)} presets={getAllPresets()} />
-        }
-        {
-          githubIntegrationOpen &&
-          <GitHubIntegration onDismiss={() => setGitHubIntegrationOpen(false)} onGotJSON={(json) => {
+        <Alert severity="success">{copiedNotif}</Alert>
+      </Snackbar>
+      {presetGalleryOpen && (
+        <PresetGallery
+          onChoosePreset={(preset) => {
+            setDatas(preset.element);
+            setPresetGalleryOpen(false);
+            setCopiedNotif(
+              `Replaced editor content with preset schema ${preset.title}`,
+            );
+          }}
+          onDismiss={() => setPresetGalleryOpen(false)}
+          presets={getAllPresets()}
+        />
+      )}
+      {githubIntegrationOpen && (
+        <GitHubIntegration
+          onDismiss={() => setGitHubIntegrationOpen(false)}
+          onGotJSON={(json) => {
             setDatas(json);
-          }} />
-        }
+          }}
+        />
+      )}
     </>
   );
 };

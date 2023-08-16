@@ -111,9 +111,7 @@
           "predefined": false
         },
         "fields": [],
-        "of": [
-          "String"
-        ],
+        "of": ["String"],
         "options": {
           "sortable": true,
           "layout": "tags"
@@ -140,9 +138,7 @@
           "predefined": false
         },
         "fields": [],
-        "of": [
-          "PhotoPost"
-        ],
+        "of": ["PhotoPost"],
         "options": {
           "sortable": true,
           "layout": "grid"
@@ -195,9 +191,7 @@
           "predefined": false
         },
         "fields": [],
-        "of": [
-          "Block"
-        ],
+        "of": ["Block"],
         "options": {
           "sortable": false,
           "layout": "grid"
@@ -236,9 +230,7 @@
           "predefined": false
         },
         "fields": [],
-        "of": [
-          "PhotoAlbum"
-        ],
+        "of": ["PhotoAlbum"],
         "options": {
           "sortable": true,
           "layout": "list"

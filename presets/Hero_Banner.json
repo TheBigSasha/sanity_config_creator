@@ -28,9 +28,7 @@
           "predefined": false
         },
         "fields": [],
-        "of": [
-          "Block"
-        ],
+        "of": ["Block"],
         "options": {
           "sortable": false,
           "layout": "list"

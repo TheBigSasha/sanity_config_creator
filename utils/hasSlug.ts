@@ -1,4 +1,7 @@
-import { SanityFieldProperties, SanityObjectFieldProperties } from "../types/SanityFieldProperties";
+import {
+  SanityFieldProperties,
+  SanityObjectFieldProperties,
+} from "../types/SanityFieldProperties";
 
 export const hasSlug = (schema: SanityFieldProperties): boolean => {
   if (schema.type === "Object") {

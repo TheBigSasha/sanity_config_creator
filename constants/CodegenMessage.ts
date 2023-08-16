@@ -27,4 +27,3 @@ export const MINI_CODEGEN_MESSAGE = `
     * Read more at the link above.
 */
 `;
-

@@ -1,1 +1,1 @@
-export const UnchoosableTypes = ["Block"]
+export const UnchoosableTypes = ["Block"];
