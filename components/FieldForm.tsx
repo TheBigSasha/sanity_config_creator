@@ -207,9 +207,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
         {type === "String" && (
           <>
             <Controller
-              {
-                /*@ts-ignore -- we know fields is on getValues() because type === 'String'*/ ...{}
-              }
+              { /*@ts-ignore -- we know fields is on getValues() because type === 'String'*/ ...{} }
               name="internalConfig.predefined"
               control={control}
               defaultValue={false}
@@ -236,9 +234,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
         {type === "Image" && (
           <>
             <Controller
-              {
-                /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{}
-              }
+              { /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{} }
               name="options.hotspot"
               control={control}
               defaultValue={false}
@@ -253,9 +249,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
             <Controller
-              {
-                /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{}
-              }
+              { /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{} }
               name="options.accept"
               control={control}
               defaultValue=""
@@ -265,9 +259,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
             <Controller
-              {
-                /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{}
-              }
+              { /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{} }
               name="options.sources"
               control={control}
               defaultValue=""
@@ -277,9 +269,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
             <Controller
-              {
-                /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{}
-              }
+              { /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{} }
               name="internalConfig.caption"
               control={control}
               defaultValue={false}
@@ -294,9 +284,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
             <Controller
-              {
-                /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{}
-              }
+              { /*@ts-ignore -- we know fields is on getValues() because type === 'Image'*/ ...{} }
               name="internalConfig.alt"
               control={control}
               defaultValue={false}
@@ -316,14 +304,10 @@ export const FieldForm: React.FC<FormFieldProps> = ({
         {type === "Reference" && (
           <>
             <Controller
-              {
-                /*@ts-ignore -- we know to is on getValues() because type === 'Reference'*/ ...{}
-              }
+              { /*@ts-ignore -- we know to is on getValues() because type === 'Reference'*/ ...{} }
               name="to"
               control={control}
-              {
-                /*@ts-ignore -- we know to is on getValues() because type === 'Reference'*/ ...{}
-              }
+              { /*@ts-ignore -- we know to is on getValues() because type === 'Reference'*/ ...{} }
               defaultValue={["Object"]}
               render={({ field }) => (
                 <Select multiple {...field} title="To" label="To">
@@ -337,9 +321,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
             <Controller
-              {
-                /*@ts-ignore -- we know weak is on getValues() because type === 'Reference'*/ ...{}
-              }
+              { /*@ts-ignore -- we know weak is on getValues() because type === 'Reference'*/ ...{} }
               name="weak"
               control={control}
               defaultValue={false}
@@ -359,14 +341,10 @@ export const FieldForm: React.FC<FormFieldProps> = ({
         {type === "Array" && (
           <>
             <Controller
-              {
-                /*@ts-ignore -- we know fields is on getValues() because type === 'Array'*/ ...{}
-              }
+              { /*@ts-ignore -- we know fields is on getValues() because type === 'Array'*/ ...{} }
               name="of"
               control={control}
-              {
-                /*@ts-ignore -- we know to is on getValues() because type === 'Array'*/ ...{}
-              }
+              { /*@ts-ignore -- we know to is on getValues() because type === 'Array'*/ ...{} }
               defaultValue={["Object"]}
               render={({ field }) => (
                 <Select multiple {...field} title="Of" label="Member Types">
@@ -380,9 +358,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
             <Controller
-              {
-                /*@ts-ignore -- we know sortable is on getValues() because type === 'Array'*/ ...{}
-              }
+              { /*@ts-ignore -- we know sortable is on getValues() because type === 'Array'*/ ...{} }
               name="options.sortable"
               control={control}
               defaultValue={false}
@@ -397,9 +373,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
             />
             <br />
             <Controller
-              {
-                /*@ts-ignore -- we know min is on getValues() because type === 'Array'*/ ...{}
-              }
+              { /*@ts-ignore -- we know min is on getValues() because type === 'Array'*/ ...{} }
               name="options.layout"
               control={control}
               defaultValue="grid"
@@ -446,9 +420,7 @@ export const FieldForm: React.FC<FormFieldProps> = ({
                     <Button onClick={() => remove(index)}>Remove</Button>
                   }
                   isRoot={false}
-                  {
-                    /*@ts-ignore -- we know fields is on getValues() because type === 'Object'*/ ...{}
-                  }
+                  { /*@ts-ignore -- we know fields is on getValues() because type === 'Object'*/ ...{} }
                   defaultValues={getValues().fields[index]}
                   onSubmit={(data) => {
                     update(index, data);
